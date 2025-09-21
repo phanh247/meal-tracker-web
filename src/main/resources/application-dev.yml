@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/meal_tracker_dev
+    username: ${DB_USERNAME:meal_tracker_dev_user}
+    password: ${DB_PASSWORD:meal_tracker_dev_pass}
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+logging:
+  level:
+    com.example.meal_tracker: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG

@@ -2,30 +2,6 @@
 
 A comprehensive Spring Boot application for tracking meals and nutritional information with JWT authentication.
 
-## Features
-
-- **User Authentication & Authorization**
-  - JWT-based authentication
-  - User registration and login
-  - Role-based access control (USER, ADMIN)
-
-- **Meal Management**
-  - Create, read, update, delete meals
-  - Track meal items with nutritional information
-  - Search meals by date range
-  - Calculate total calories and macronutrients
-
-- **Food Database**
-  - Comprehensive food database with nutritional information
-  - Food categories and verification system
-  - Search functionality
-
-- **Security**
-  - Spring Security with JWT tokens
-  - Password encryption with BCrypt
-  - CORS configuration
-  - Global exception handling
-
 ## Technology Stack
 
 - **Backend**: Spring Boot 3.2.0
@@ -45,56 +21,21 @@ A comprehensive Spring Boot application for tracking meals and nutritional infor
 
 ## Setup Instructions
 
-### 1. Database Setup
+### 1. Install maven 
+Link download: https://phoenixnap.com/kb/install-maven-windows
 
-Create a PostgreSQL database:
+### 2. Clone the repository
 
-```sql
-CREATE DATABASE meal_tracker;
-CREATE USER meal_tracker_user WITH PASSWORD 'meal_tracker_pass';
-GRANT ALL PRIVILEGES ON DATABASE meal_tracker TO meal_tracker_user;
-```
-
-### 2. Environment Variables
-
-Set the following environment variables:
-
-```bash
-export DB_USERNAME=meal_tracker_user
-export DB_PASSWORD=meal_tracker_pass
-export JWT_SECRET=your-secret-key-here
-```
-
-### 3. Build and Run
-
-```bash
-# Build the application
-mvn clean install
-
-# Run the application
-mvn spring-boot:run
-```
-
-The application will start on `http://localhost:8080/api`
-
-## API Endpoints
-
-### Authentication
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Login user
-- `GET /api/auth/health` - Health check
-
-### Meals
-- `POST /api/meals` - Create a new meal
-- `GET /api/meals/{id}` - Get meal by ID
-- `GET /api/meals` - Get all meals for user
-- `GET /api/meals/paginated` - Get paginated meals
-- `GET /api/meals/date-range` - Get meals by date range
-- `GET /api/meals/date` - Get meals by specific date
-- `PUT /api/meals/{id}` - Update meal
-- `DELETE /api/meals/{id}` - Delete meal
-- `GET /api/meals/stats/calories` - Get total calories for date
-- `GET /api/meals/stats/count` - Get meal count for date
+1. Choose a folder in local to store the project
+2. In the folder, open terminal -> Clone the repository using git command:
+   ```bash
+   git clone https://github.com/phanh247/meal-tracker-web.git
+   ```
+3. Open the project in your IDE
+4. Set up maven in your IDE by choosing the maven home directory (the folder where you installed maven)
+Example: `C:\Program Files\apache-maven-3.6.3`
+4. Wait for Maven to download all dependencies
+5. Run the application at file MealTrackerWebApplication.java
 
 ## Project Structure
 
@@ -102,59 +43,29 @@ The application will start on `http://localhost:8080/api`
 src/
 ├── main/
 │   ├── java/com/example/meal_tracker/
-│   │   ├── config/          # Configuration classes
-│   │   ├── controller/      # REST controllers
+│   │   ├── config/         # Configuration classes
+│   │   ├── controller/     # REST controllers
 │   │   ├── dto/            # Data Transfer Objects
 │   │   ├── entity/         # JPA entities
 │   │   ├── exception/      # Exception handling
 │   │   ├── repository/     # Data repositories
 │   │   ├── security/       # Security configuration
-│   │   └── service/       # Business logic services
-│   └── resources/
-│       ├── application.yml
-│       ├── application-dev.yml
-│       └── application-prod.yml
+│   │   └── service/        # Business logic services
+│   └── resources/          # Application resources 
 └── test/
     ├── java/              # Test classes
-    └── resources/
-        └── application-test.yml
 ```
 
-## Configuration Profiles
-
-- **default**: Production configuration
-- **dev**: Development configuration with detailed logging
-- **prod**: Production configuration with minimal logging
-- **test**: Test configuration with H2 in-memory database
-
-## Security
-
-The application uses JWT tokens for authentication. Include the token in the Authorization header:
-
-```
-Authorization: Bearer <your-jwt-token>
-```
-
-## Testing
-
-Run tests with:
-
-```bash
-mvn test
-```
-
-## Docker Support
-
-The application includes TestContainers for integration testing with PostgreSQL.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License.
+## Common git commands
+1. Git clone: `git clone <repository-url>`
+2. Check status: `git status`
+3. Add changes: `git add .`
+4. Commit changes: `git commit -m "Your commit message"`
+5. Push changes: `git push`
+6. Pull latest changes: `git pull`
+7. Check current branch: `git branch`
+8. Create a new branch: `git checkout -b <branch-name>`
+9. Switch branches: `git checkout <branch-name>`
+10. Merge branches: `git merge <branch-name>`
+11. View commit history: `git log`
+12. Stash changes: `git stash`

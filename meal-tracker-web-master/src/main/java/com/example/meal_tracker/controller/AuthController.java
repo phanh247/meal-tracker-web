@@ -17,6 +17,8 @@ public class AuthController {
     // DTO nhan du lieu dang ky
     public record RegisterRequest(String name, String email, String password) {}
 
+
+    //Dang ky
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {

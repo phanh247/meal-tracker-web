@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,10 +45,19 @@ public class MealController {
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MealResponse> getMealById(@PathVariable("id") Long id) throws InvalidDataException {
+    public ResponseEntity<MealResponse> getMealById(@PathVariable("id") Long id) {
         LOGGER.info("Received request to get meal by id: {}", id);
         MealResponse response = mealService.getMealById(id);
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping(value = "/update/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updateMeal(@PathVariable("id") Long id,
+                                           @RequestBody @Valid AddMealRequest request) throws InvalidDataException {
+        LOGGER.info("Received request to update meal with id: {}", id);
+        RequestValidate.validateRequest(request);
+        mealService.updateMeal(id, request);
+        return ResponseEntity.ok().build();
     }
             
 }

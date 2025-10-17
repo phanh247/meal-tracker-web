@@ -65,7 +65,13 @@ public class MealServiceImpl implements MealService {
 
     @Override
     public void updateMeal(Long id, AddMealRequest request) {
-
+        mealRepository.findById(id).ifPresent(meal -> {
+            meal.setName(request.getMealName());
+            meal.setImageUrl(request.getMealImageUrl());
+            meal.setCalories(request.getCalories());
+            meal.setDescription(request.getMealDescription());
+            mealRepository.save(meal);
+        });
     }
 
     @Override

@@ -2,12 +2,10 @@ package com.example.meal_tracker.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,36 +13,27 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-@Table(name = "meal")
-public class Meal implements Serializable {
+@Table(name = "category")
+public class Category implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name = "meal_id", nullable = false)
+    @Column(name = "category_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "meal_name", nullable = false)
+    @Column(name = "category_name", nullable = false, unique = true)
     private String name;
-    @Column(name = "meal_image_url")
-    private String imageUrl;
-    @Column(name = "meal_calories", nullable = false)
-    private float calories;
-    @Column(name = "meal_description")
-    private String description;
     @Column(name = "created_at", nullable = false)
     private Long createdAt;
     @Column(name = "updated_at")
     private Long updatedAt;
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "user_id", nullable = false)
-//    private Author author;
+    @OneToMany(mappedBy = "category")
+    private List<Meal> meals;
 }

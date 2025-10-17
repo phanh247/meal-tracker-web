@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.example.meal_tracker.common.ErrorConstant.MEAL_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -42,12 +44,23 @@ public class MealServiceImpl implements MealService {
 
     @Override
     public List<MealResponse> getMeals() {
-        return List.of();
+        List<Meal> meals = mealRepository.findAll();
+        if (!meals.isEmpty()) {
+            return meals.stream().map(ConverterUtil::convertToDto).toList();
+        } else {
+            LOGGER.info("No meals found in the database.");
+            return List.of();
+        }
     }
 
     @Override
     public MealResponse getMealById(Long id) {
-        return null;
+        return mealRepository.findById(id)
+                .map(ConverterUtil::convertToDto)
+                .orElseGet(() -> {
+                    LOGGER.info(MEAL_NOT_FOUND, id);
+                    return null;
+                });
     }
 
     @Override

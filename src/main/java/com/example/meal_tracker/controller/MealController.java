@@ -11,10 +11,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/meal")
@@ -31,4 +35,19 @@ public class MealController {
         MealResponse response = mealService.addNewMeal(request);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<MealResponse>> getMeals() {
+        LOGGER.info("Received request to get all meals");
+        List<MealResponse> response = mealService.getMeals();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MealResponse> getMealById(@PathVariable("id") Long id) throws InvalidDataException {
+        LOGGER.info("Received request to get meal by id: {}", id);
+        MealResponse response = mealService.getMealById(id);
+        return ResponseEntity.ok(response);
+    }
+            
 }

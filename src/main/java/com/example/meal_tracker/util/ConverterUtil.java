@@ -1,6 +1,7 @@
 package com.example.meal_tracker.util;
 
 import com.example.meal_tracker.dto.request.AddMealRequest;
+import com.example.meal_tracker.dto.response.MealResponse;
 import com.example.meal_tracker.entity.Meal;
 
 public final class ConverterUtil {
@@ -13,6 +14,18 @@ public final class ConverterUtil {
                 .calories(request.getCalories())
                 .createdAt(now)
                 .updatedAt(now)
+                .build();
+    }
+
+    public static MealResponse convertToDto(Meal meal) {
+        return MealResponse.builder()
+                .id(meal.getId())
+                .name(meal.getName())
+                .imageUrl(meal.getImageUrl())
+                .calories(meal.getCalories())
+                .description(meal.getDescription())
+                .createdAt(meal.getCreatedAt())
+                .updatedAt(meal.getUpdatedAt())
                 .build();
     }
 }

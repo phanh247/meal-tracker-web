@@ -2,8 +2,11 @@ package com.example.meal_tracker.service.impl;
 
 import com.example.meal_tracker.dto.request.AddMealRequest;
 import com.example.meal_tracker.dto.response.MealResponse;
+import com.example.meal_tracker.entity.Category;
 import com.example.meal_tracker.entity.Meal;
+import com.example.meal_tracker.exception.MealManagementException;
 import com.example.meal_tracker.exception.NotFoundException;
+import com.example.meal_tracker.repository.CategoryRepository;
 import com.example.meal_tracker.repository.MealRepository;
 import com.example.meal_tracker.service.MealService;
 import com.example.meal_tracker.util.ConverterUtil;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.meal_tracker.common.ErrorConstant.CATEGORY_NOT_FOUND;
 import static com.example.meal_tracker.common.ErrorConstant.MEAL_NOT_FOUND;
 
 @Service
@@ -25,23 +29,20 @@ public class MealServiceImpl implements MealService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MealServiceImpl.class);
 
     private final MealRepository mealRepository;
-
+    private final CategoryRepository categoryRepository;
 
     @Override
-    public MealResponse addNewMeal(AddMealRequest request) {
-
+    public MealResponse addNewMeal(AddMealRequest request) throws NotFoundException {
+        Optional<Category> category = categoryRepository.findByName(request.getCategoryName());
+        if (category.isEmpty()) {
+            LOGGER.info("Category with name '{}' does not exist.", request.getCategoryName());
+            throw new NotFoundException(String.format(CATEGORY_NOT_FOUND, request.getCategoryName()));
+        }
         Meal meal = ConverterUtil.convertToEntity(request);
+        meal.setCategory(category.get());
         mealRepository.save(meal);
 
-        return MealResponse.builder()
-                .id(meal.getId())
-                .name(meal.getName())
-                .imageUrl(meal.getImageUrl())
-                .calories(meal.getCalories())
-                .description(meal.getDescription())
-                .createdAt(meal.getCreatedAt())
-                .updatedAt(meal.getUpdatedAt())
-                .build();
+        return ConverterUtil.convertToDto(meal);
     }
 
     @Override
@@ -56,13 +57,9 @@ public class MealServiceImpl implements MealService {
     }
 
     @Override
-    public MealResponse getMealById(Long id) {
-        return mealRepository.findById(id)
-                .map(ConverterUtil::convertToDto)
-                .orElseGet(() -> {
-                    LOGGER.info(MEAL_NOT_FOUND, id);
-                    return null;
-                });
+    public MealResponse getMealById(Long id) throws NotFoundException {
+        Optional<Meal> meal = checkMealExists(id);
+        return ConverterUtil.convertToDto(meal.get());
     }
 
     @Override

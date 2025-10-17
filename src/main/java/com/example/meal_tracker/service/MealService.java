@@ -7,9 +7,9 @@ import com.example.meal_tracker.exception.NotFoundException;
 import java.util.List;
 
 public interface MealService {
-    MealResponse addNewMeal(AddMealRequest request);
+    MealResponse addNewMeal(AddMealRequest request) throws NotFoundException;
     List<MealResponse> getMeals();
-    MealResponse getMealById(Long id);
+    MealResponse getMealById(Long id) throws NotFoundException;
     void updateMeal(Long id, AddMealRequest request) throws NotFoundException;
     void deleteMeal(Long id) throws NotFoundException;
 }

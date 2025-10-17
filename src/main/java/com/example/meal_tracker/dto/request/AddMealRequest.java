@@ -16,12 +16,14 @@ public class AddMealRequest implements Serializable {
     private String mealDescription;
     private String mealImageUrl;
     private float calories;
+    private String categoryName;
 
     @Override
     public String toString() {
         return "AddMealRequest{" +
                 "calories=" + calories +
                 ", mealName='" + mealName + '\'' +
+                ", categoryName='" + categoryName + '\'' +
                 ", mealDescription='" + mealDescription + '\'' +
                 ", mealImageUrl='" + mealImageUrl + '\'' +
                 '}';

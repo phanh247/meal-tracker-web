@@ -6,11 +6,13 @@ import com.example.meal_tracker.exception.InvalidDataException;
 import com.example.meal_tracker.exception.MealManagementException;
 import com.example.meal_tracker.exception.NotFoundException;
 import com.example.meal_tracker.service.MealService;
-import com.example.meal_tracker.util.RequestValidate;
+import com.example.meal_tracker.util.RequestValidator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Not;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,14 +35,15 @@ public class MealController {
     private final MealService mealService;
 
     @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MealResponse> addNewMeal(@RequestBody @Valid AddMealRequest request) throws MealManagementException {
+    public ResponseEntity<?> addNewMeal(@RequestBody @Valid AddMealRequest request) {
         try {
             LOGGER.info("Received request to add new meal: {}", request);
-            RequestValidate.validateRequest(request);
+            RequestValidator.validateRequest(request);
             MealResponse response = mealService.addNewMeal(request);
             return ResponseEntity.ok(response);
-        } catch (InvalidDataException e) {
-            throw new MealManagementException(e.getMessage(), e);
+        } catch (InvalidDataException | NotFoundException e) {
+            LOGGER.error("Error adding new meal: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
@@ -53,33 +56,39 @@ public class MealController {
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MealResponse> getMealById(@PathVariable("id") Long id) {
-        LOGGER.info("Received request to get meal by id: {}", id);
-        MealResponse response = mealService.getMealById(id);
-        return ResponseEntity.ok(response);
+        try {
+            LOGGER.info("Received request to get meal by id: {}", id);
+            MealResponse response = mealService.getMealById(id);
+            return ResponseEntity.ok(response);
+        } catch (NotFoundException e) {
+            LOGGER.error("Error retrieving meal: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @PutMapping(value = "/update/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> updateMeal(@PathVariable("id") Long id,
-                                           @RequestBody @Valid AddMealRequest request)
-    throws MealManagementException {
+    public ResponseEntity<?> updateMeal(@PathVariable("id") Long id,
+                                           @RequestBody @Valid AddMealRequest request) {
         try {
             LOGGER.info("Received request to update meal with id: {}", id);
-            RequestValidate.validateRequest(request);
+            RequestValidator.validateRequest(request);
             mealService.updateMeal(id, request);
             return ResponseEntity.ok(true);
         } catch (InvalidDataException | NotFoundException e) {
-            throw new MealManagementException(e.getMessage(), e);
+            LOGGER.error("Error updating meal: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     @DeleteMapping(value = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> deleteMeal(@PathVariable("id") Long id) throws MealManagementException {
+    public ResponseEntity<?> deleteMeal(@PathVariable("id") Long id) {
         try {
             LOGGER.info("Received request to delete meal with id: {}", id);
             mealService.deleteMeal(id);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(true);
         } catch (NotFoundException e) {
-            throw new MealManagementException(e.getMessage(), e);
+            LOGGER.error("Error deleting meal: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 }

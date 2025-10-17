@@ -14,6 +14,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -46,14 +50,10 @@ public class MealServiceImpl implements MealService {
     }
 
     @Override
-    public List<MealResponse> getMeals() {
-        List<Meal> meals = mealRepository.findAll();
-        if (!meals.isEmpty()) {
-            return meals.stream().map(ConverterUtil::convertToDto).toList();
-        } else {
-            LOGGER.info("No meals found in the database.");
-            return List.of();
-        }
+    public Page<MealResponse> getMeals(Pageable pageable) {
+        pageable = PageRequest.of(0, 10, Sort.by("id"));
+        Page<Meal> meals = mealRepository.findAll(pageable);
+        return meals.map(ConverterUtil::convertToDto);
     }
 
     @Override

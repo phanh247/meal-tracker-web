@@ -1,6 +1,7 @@
 package com.example.meal_tracker.controller;
 
 import com.example.meal_tracker.dto.request.AddMealRequest;
+import com.example.meal_tracker.dto.response.CategoryResponse;
 import com.example.meal_tracker.dto.response.MealResponse;
 import com.example.meal_tracker.exception.InvalidDataException;
 import com.example.meal_tracker.exception.MealManagementException;
@@ -12,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Not;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -48,10 +52,9 @@ public class MealController {
     }
 
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<MealResponse>> getMeals() {
+    public ResponseEntity<Page<MealResponse>> getMeals(@PageableDefault(size = 10) Pageable pageable) {
         LOGGER.info("Received request to get all meals");
-        List<MealResponse> response = mealService.getMeals();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(mealService.getMeals(pageable));
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

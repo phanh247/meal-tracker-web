@@ -3,6 +3,8 @@ package com.example.meal_tracker.controller;
 import com.example.meal_tracker.dto.request.AddMealRequest;
 import com.example.meal_tracker.dto.response.MealResponse;
 import com.example.meal_tracker.exception.InvalidDataException;
+import com.example.meal_tracker.exception.MealManagementException;
+import com.example.meal_tracker.exception.NotFoundException;
 import com.example.meal_tracker.service.MealService;
 import com.example.meal_tracker.util.RequestValidate;
 import jakarta.validation.Valid;
@@ -11,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,11 +33,15 @@ public class MealController {
     private final MealService mealService;
 
     @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MealResponse> addNewMeal(@RequestBody @Valid AddMealRequest request) throws InvalidDataException {
-        LOGGER.info("Received request to add new meal: {}", request);
-        RequestValidate.validateRequest(request);
-        MealResponse response = mealService.addNewMeal(request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<MealResponse> addNewMeal(@RequestBody @Valid AddMealRequest request) throws MealManagementException {
+        try {
+            LOGGER.info("Received request to add new meal: {}", request);
+            RequestValidate.validateRequest(request);
+            MealResponse response = mealService.addNewMeal(request);
+            return ResponseEntity.ok(response);
+        } catch (InvalidDataException e) {
+            throw new MealManagementException(e.getMessage(), e);
+        }
     }
 
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -52,12 +59,27 @@ public class MealController {
     }
 
     @PutMapping(value = "/update/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateMeal(@PathVariable("id") Long id,
-                                           @RequestBody @Valid AddMealRequest request) throws InvalidDataException {
-        LOGGER.info("Received request to update meal with id: {}", id);
-        RequestValidate.validateRequest(request);
-        mealService.updateMeal(id, request);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Boolean> updateMeal(@PathVariable("id") Long id,
+                                           @RequestBody @Valid AddMealRequest request)
+    throws MealManagementException {
+        try {
+            LOGGER.info("Received request to update meal with id: {}", id);
+            RequestValidate.validateRequest(request);
+            mealService.updateMeal(id, request);
+            return ResponseEntity.ok(true);
+        } catch (InvalidDataException | NotFoundException e) {
+            throw new MealManagementException(e.getMessage(), e);
+        }
     }
-            
+
+    @DeleteMapping(value = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> deleteMeal(@PathVariable("id") Long id) throws MealManagementException {
+        try {
+            LOGGER.info("Received request to delete meal with id: {}", id);
+            mealService.deleteMeal(id);
+            return ResponseEntity.ok().build();
+        } catch (NotFoundException e) {
+            throw new MealManagementException(e.getMessage(), e);
+        }
+    }
 }

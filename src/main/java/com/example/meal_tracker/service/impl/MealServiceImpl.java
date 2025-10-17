@@ -3,6 +3,7 @@ package com.example.meal_tracker.service.impl;
 import com.example.meal_tracker.dto.request.AddMealRequest;
 import com.example.meal_tracker.dto.response.MealResponse;
 import com.example.meal_tracker.entity.Meal;
+import com.example.meal_tracker.exception.NotFoundException;
 import com.example.meal_tracker.repository.MealRepository;
 import com.example.meal_tracker.service.MealService;
 import com.example.meal_tracker.util.ConverterUtil;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.example.meal_tracker.common.ErrorConstant.MEAL_NOT_FOUND;
 
@@ -64,18 +66,31 @@ public class MealServiceImpl implements MealService {
     }
 
     @Override
-    public void updateMeal(Long id, AddMealRequest request) {
-        mealRepository.findById(id).ifPresent(meal -> {
-            meal.setName(request.getMealName());
-            meal.setImageUrl(request.getMealImageUrl());
-            meal.setCalories(request.getCalories());
-            meal.setDescription(request.getMealDescription());
-            mealRepository.save(meal);
-        });
+    public void updateMeal(Long id, AddMealRequest request) throws NotFoundException {
+        Optional<Meal> meal = checkMealExists(id);
+        Meal existingMeal = meal.get();
+        existingMeal.setName(request.getMealName());
+        existingMeal.setImageUrl(request.getMealImageUrl());
+        existingMeal.setCalories(request.getCalories());
+        existingMeal.setDescription(request.getMealDescription());
+
+        LOGGER.info("Updating meal with id: {}", id);
+        mealRepository.save(existingMeal);
     }
 
     @Override
-    public void deleteMeal(Long id) {
+    public void deleteMeal(Long id) throws NotFoundException {
+        Optional<Meal> meal = checkMealExists(id);
+        LOGGER.info("Deleting meal with id: {}", id);
+        mealRepository.delete(meal.get());
+    }
 
+    private Optional<Meal> checkMealExists(Long id) throws NotFoundException {
+        Optional<Meal> meal = mealRepository.findById(id);
+        if (meal.isEmpty()) {
+            LOGGER.info(MEAL_NOT_FOUND, id);
+            throw new NotFoundException(String.format(MEAL_NOT_FOUND, id));
+        }
+        return meal;
     }
 }

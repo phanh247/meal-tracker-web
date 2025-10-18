@@ -82,6 +82,18 @@ public class MealServiceImpl implements MealService {
         mealRepository.delete(meal.get());
     }
 
+    @Override
+    public Page<MealResponse> filterMeals(String categoryName, String mealName, float calories, Pageable pageable)
+    throws NotFoundException {
+        Specification<Meal> spec = Specification
+                .where(MealSpecification.hasName(name))
+                .and(MealSpecification.hasCategory(category))
+                .and(MealSpecification.priceBetween(minPrice, maxPrice))
+                .and(MealSpecification.hasIngredient(ingredient));
+
+        return mealRepository.findAll(spec, pageable);
+    }
+
     private Optional<Meal> checkMealExists(Long id) throws NotFoundException {
         Optional<Meal> meal = mealRepository.findById(id);
         if (meal.isEmpty()) {

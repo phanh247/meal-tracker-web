@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -93,5 +94,15 @@ public class MealController {
             LOGGER.error("Error deleting meal: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
+    }
+
+    @GetMapping("/filter")
+    public Page<MealResponse> filterMeals(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) float calories,
+            @PageableDefault(size = 10) Pageable pageable
+    ) throws NotFoundException {
+        return mealService.filterMeals(name, category, calories, pageable);
     }
 }

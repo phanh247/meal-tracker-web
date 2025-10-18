@@ -12,4 +12,5 @@ public interface MealService {
     MealResponse getMealById(Long id) throws NotFoundException;
     void updateMeal(Long id, AddMealRequest request) throws NotFoundException;
     void deleteMeal(Long id) throws NotFoundException;
+    Page<MealResponse> filterMeals(String categoryName, String mealName, float calories, Pageable pageable) throws NotFoundException;
 }

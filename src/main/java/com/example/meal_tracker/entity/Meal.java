@@ -21,7 +21,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Data
 @Builder
-@Table(name = "meal")
+@Table(name = "meals")
 public class Meal implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -44,7 +44,8 @@ public class Meal implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "user_id", nullable = false)
-//    private Author author;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

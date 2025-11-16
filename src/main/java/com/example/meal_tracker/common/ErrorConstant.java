@@ -12,6 +12,14 @@ public final class ErrorConstant {
     public static final String DATABASE_ERROR = "Database error occurred";
     public static final String INVALID_REQUEST_DATA = "Invalid request data";
 
+    public static final String MEAL_PLAN_EXISTED = "Meal plan with name %s already exists";
+
+    public static final String MEAL_PLAN_NOT_FOUND = "Meal plan with id %s not found.";
+
+
+    public static final String INVALID_MEAL_PLAN_NAME_PARAM = "Meal plan name cannot be null or empty";
+
+
     private ErrorConstant() throws IllegalAccessException {
         throw new IllegalAccessException("Cannot instantiate utility class");
     }

@@ -1,10 +1,13 @@
 package com.example.meal_tracker.util;
 
+import com.example.meal_tracker.dto.request.AddMealPlanRequest;
 import com.example.meal_tracker.dto.request.AddMealRequest;
 import com.example.meal_tracker.dto.response.CategoryResponse;
+import com.example.meal_tracker.dto.response.MealPlanResponse;
 import com.example.meal_tracker.dto.response.MealResponse;
 import com.example.meal_tracker.entity.Category;
 import com.example.meal_tracker.entity.Meal;
+import com.example.meal_tracker.entity.MealPlan;
 
 public final class ConverterUtil {
     public static Meal convertToEntity(AddMealRequest request) {
@@ -47,6 +50,27 @@ public final class ConverterUtil {
                 .name(category.getName())
                 .createdAt(category.getCreatedAt())
                 .updatedAt(category.getUpdatedAt())
+                .build();
+    }
+
+    public static MealPlan convertToEntity(AddMealPlanRequest request) {
+        long now = System.currentTimeMillis();
+        return MealPlan.builder()
+                .name(request.mealPlanName)
+                .userId(request.userId)
+                .isSuggested(request.isSuggested)
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
+    }
+
+    public static MealPlanResponse convertToDto(MealPlan mealPlan) {
+        return MealPlanResponse.builder()
+                .id(mealPlan.getId())
+                .name(mealPlan.getName())
+                .isSuggested(mealPlan.getIsSuggested())
+                .createdAt(mealPlan.getCreatedAt())
+                .updatedAt(mealPlan.getUpdatedAt())
                 .build();
     }
 }

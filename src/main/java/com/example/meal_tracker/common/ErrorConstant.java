@@ -14,6 +14,9 @@ public final class ErrorConstant {
 
     public static final String MEAL_PLAN_EXISTED = "Meal plan with name %s already exists";
 
+    public static final String MEAL_PLAN_NOT_FOUND = "Meal plan with id %s not found.";
+
+
     public static final String INVALID_MEAL_PLAN_NAME_PARAM = "Meal plan name cannot be null or empty";
 
 

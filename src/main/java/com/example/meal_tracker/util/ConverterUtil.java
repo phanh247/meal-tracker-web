@@ -57,10 +57,20 @@ public final class ConverterUtil {
         long now = System.currentTimeMillis();
         return MealPlan.builder()
                 .name(request.mealPlanName)
+                .userId(request.userId)
                 .isSuggested(request.isSuggested)
                 .createdAt(now)
                 .updatedAt(now)
-                .build();       
+                .build();
     }
 
+    public static MealPlanResponse convertToDto(MealPlan mealPlan) {
+        return MealPlanResponse.builder()
+                .id(mealPlan.getId())
+                .name(mealPlan.getName())
+                .isSuggested(mealPlan.getIsSuggested())
+                .createdAt(mealPlan.getCreatedAt())
+                .updatedAt(mealPlan.getUpdatedAt())
+                .build();
+    }
 }

@@ -2,11 +2,18 @@ package com.example.meal_tracker.service.impl;
 
 import com.example.meal_tracker.common.ErrorConstant;
 import com.example.meal_tracker.dto.request.AddMealPlanRequest;
+import com.example.meal_tracker.dto.request.AddMealPlanDayRequest;
 import com.example.meal_tracker.dto.request.UpdateMealPlanRequest;
+import com.example.meal_tracker.dto.request.UpdateMealPlanDayRequest;
+import com.example.meal_tracker.dto.response.CategoryResponse;
 import com.example.meal_tracker.dto.response.MealPlanResponse;
+import com.example.meal_tracker.dto.response.MealPlanDayResponse;
 import com.example.meal_tracker.entity.MealPlan;
+import com.example.meal_tracker.entity.MealPlanDay;
 import com.example.meal_tracker.repository.MealPlanRepository;
+import com.example.meal_tracker.repository.MealPlanDayRepository;
 import com.example.meal_tracker.service.MealPlanService;
+import com.example.meal_tracker.service.MealPlanDayService;
 import com.example.meal_tracker.util.ConverterUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,35 +33,32 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class MealPlanServiceImpl implements MealPlanService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MealPlanServiceImpl.class);
+public class MealPlanDayServiceImpl implements MealPlanDayService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MealPlanDayServiceImpl.class);
 
+    private final MealPlanDayRepository mealPlanDayRepository;
     private final MealPlanRepository mealPlanRepository;
 
     @SuppressWarnings("null")
-    public MealPlanResponse addNewMealPlan(AddMealPlanRequest addMealPlanRequest) throws BadRequestException {
-        // Check if mealPlanName is null or empty
-        if (addMealPlanRequest.mealPlanName == null || addMealPlanRequest.mealPlanName == "") {
-            LOGGER.info("Meal plan with name '{}' is empty.", addMealPlanRequest.mealPlanName);
-            throw new BadRequestException(String.format(ErrorConstant.INVALID_MEAL_PLAN_NAME_PARAM));
-        }
+    public MealPlanDayResponse addNewMealPlanDay(AddMealPlanDayRequest addMealPlanDayRequest)
+            throws BadRequestException {
 
-        // Find if mealPlanName already exists
-        Optional<MealPlan> existingMealPlan = mealPlanRepository.findByName(addMealPlanRequest.mealPlanName);
-        if (existingMealPlan.isPresent()) {
-            LOGGER.info("Meal plan with name '{}' already exists.", addMealPlanRequest.mealPlanName);
+        // Find if mealPlanId not found
+        Optional<MealPlan> existingMealPlan = mealPlanRepository.findById(addMealPlanDayRequest.mealPlanId);
+        if (existingMealPlan == null) {
+            LOGGER.info("Meal plan with id '{}' not found.", addMealPlanDayRequest.mealPlanId);
             throw new BadRequestException(
-                    String.format(ErrorConstant.MEAL_PLAN_EXISTED, addMealPlanRequest.mealPlanName));
+                    String.format(ErrorConstant.MEAL_PLAN_NOT_FOUND, addMealPlanDayRequest.mealPlanId));
         }
 
-        MealPlan newMealPlanEntity = ConverterUtil.convertToEntity(addMealPlanRequest);
-        mealPlanRepository.save(newMealPlanEntity);
-        return ConverterUtil.convertToDto(newMealPlanEntity);
+        MealPlanDay newMealPlanDayEntity = ConverterUtil.convertToEntity(addMealPlanDayRequest);
+        mealPlanDayRepository.save(newMealPlanDayEntity);
+        return ConverterUtil.convertToDto(newMealPlanDayEntity);
     }
 
     @SuppressWarnings("null")
     @Override
-    public void updateMealPlan(Long mealPlanId, UpdateMealPlanRequest updateMealPlanRequest)
+    public void updateMealPlanDay(Long mealPlanId, UpdateMealPlanDayRequest updateMealPlanRequest)
             throws BadRequestException {
 
         if (mealPlanRepository.findById(mealPlanId).isEmpty()) {
@@ -72,16 +76,16 @@ public class MealPlanServiceImpl implements MealPlanService {
 
     @SuppressWarnings("null")
     @Override
-    public void deleteMealPlan(Long mealPlanId) throws BadRequestException {
-        if (mealPlanRepository.findById(mealPlanId).isEmpty()) {
-            LOGGER.info(MEAL_PLAN_NOT_FOUND, mealPlanId);
-            throw new BadRequestException(String.format(MEAL_PLAN_NOT_FOUND, mealPlanId));
+    public void deleteMealPlanDay(Long mealPlanDayId) throws BadRequestException {
+        if (mealPlanDayRepository.findById(mealPlanDayId).isEmpty()) {
+            LOGGER.info(MEAL_PLAN_DAY_NOT_FOUND, mealPlanDayId);
+            throw new BadRequestException(String.format(MEAL_PLAN_NOT_FOUND, mealPlanDayId));
         }
-        mealPlanRepository.deleteById(mealPlanId);
+        mealPlanRepository.deleteById(mealPlanDayId);
     }
 
     @Override
-    public Page<MealPlanResponse> getMealPlans(Pageable pageable, Long userId) {
+    public Page<MealPlanDayResponse> getMealPlans(Pageable pageable, Long userId) {
         pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
         Page<MealPlan> mealPlans = mealPlanRepository.findByUserId(pageable, userId);
         return mealPlans.map(ConverterUtil::convertToDto);

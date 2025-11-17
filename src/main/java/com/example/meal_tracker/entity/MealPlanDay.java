@@ -17,7 +17,6 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.sql.Date;
 
-
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -35,8 +34,8 @@ public class MealPlanDay implements Serializable {
     @JoinColumn(name = "meal_plan_id", nullable = false)
     private MealPlan mealPlan;
 
-    @Column(name = "meal_plan_name", nullable = false, unique = true)
-    private String mealPlanName;
+    @Column(name = "meal_plan_id", nullable = false)
+    private Long mealPlanId;
 
     @Column(name = "date", nullable = false)
     private Date date;

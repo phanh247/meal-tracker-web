@@ -1,13 +1,19 @@
 package com.example.meal_tracker.util;
 
 import com.example.meal_tracker.dto.request.AddMealPlanRequest;
+
+import java.sql.Date;
+
+import com.example.meal_tracker.dto.request.AddMealPlanDayRequest;
 import com.example.meal_tracker.dto.request.AddMealRequest;
 import com.example.meal_tracker.dto.response.CategoryResponse;
+import com.example.meal_tracker.dto.response.MealPlanDayResponse;
 import com.example.meal_tracker.dto.response.MealPlanResponse;
 import com.example.meal_tracker.dto.response.MealResponse;
 import com.example.meal_tracker.entity.Category;
 import com.example.meal_tracker.entity.Meal;
 import com.example.meal_tracker.entity.MealPlan;
+import com.example.meal_tracker.entity.MealPlanDay;
 
 public final class ConverterUtil {
     public static Meal convertToEntity(AddMealRequest request) {
@@ -44,6 +50,13 @@ public final class ConverterUtil {
                 .build();
     }
 
+    public static MealPlanDayResponse convertToDto(MealPlanDay mealPlanDay) {
+        return MealPlanDayResponse.builder()
+                .mealPlanId(mealPlanDay.getMealPlanId())
+                .date(mealPlanDay.getDate().toString())
+                .build();
+    }
+
     public static CategoryResponse convertToDto(Category category) {
         return CategoryResponse.builder()
                 .id(category.getId())
@@ -72,5 +85,9 @@ public final class ConverterUtil {
                 .createdAt(mealPlan.getCreatedAt())
                 .updatedAt(mealPlan.getUpdatedAt())
                 .build();
+    }
+
+    public static MealPlanDay convertToEntity(AddMealPlanDayRequest request) {
+        return MealPlanDay.builder().mealPlanId(request.mealPlanId).date(Date.valueOf(request.date)).build();
     }
 }

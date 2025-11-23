@@ -26,5 +26,10 @@ public class MealSpecification {
             return null;
         };
     }
+
+    public static Specification<Meal> hasIngredient(String ingredient) {
+        return (root, query, builder) -> ingredient == null ? null :
+                builder.like(builder.lower(root.get("ingredient")), "%" + ingredient.toLowerCase() + "%");
+    }
     
 }

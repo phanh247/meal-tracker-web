@@ -9,6 +9,7 @@ import com.example.meal_tracker.exception.NotFoundException;
 import com.example.meal_tracker.repository.CategoryRepository;
 import com.example.meal_tracker.repository.MealRepository;
 import com.example.meal_tracker.service.MealService;
+import com.example.meal_tracker.specification.MealSpecification;
 import com.example.meal_tracker.util.ConverterUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -83,13 +85,13 @@ public class MealServiceImpl implements MealService {
     }
 
     @Override
-    public Page<MealResponse> filterMeals(String categoryName, String mealName, float calories, Pageable pageable)
-    throws NotFoundException {
+    public Page<MealResponse> filterMeals(String categoryName, String mealName, Double minCalories, Double maxCalories,
+                                          String ingredientName, Pageable pageable) {
         Specification<Meal> spec = Specification
-                .where(MealSpecification.hasName(name))
-                .and(MealSpecification.hasCategory(category))
-                .and(MealSpecification.priceBetween(minPrice, maxPrice))
-                .and(MealSpecification.hasIngredient(ingredient));
+                .where(MealSpecification.hasName(mealName))
+                .or(MealSpecification.hasCategoryName(categoryName))
+                .or(MealSpecification.hasIngredient(ingredientName))
+                .or(MealSpecification.caloriesBetween(minCalories, maxCalories));
 
         return mealRepository.findAll(spec, pageable);
     }

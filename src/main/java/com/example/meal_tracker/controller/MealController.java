@@ -1,16 +1,13 @@
 package com.example.meal_tracker.controller;
 
 import com.example.meal_tracker.dto.request.AddMealRequest;
-import com.example.meal_tracker.dto.response.CategoryResponse;
 import com.example.meal_tracker.dto.response.MealResponse;
 import com.example.meal_tracker.exception.InvalidDataException;
-import com.example.meal_tracker.exception.MealManagementException;
 import com.example.meal_tracker.exception.NotFoundException;
 import com.example.meal_tracker.service.MealService;
 import com.example.meal_tracker.util.RequestValidator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Not;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -28,8 +25,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/meal")
@@ -98,11 +93,13 @@ public class MealController {
 
     @GetMapping("/filter")
     public Page<MealResponse> filterMeals(
-            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String mealName,
             @RequestParam(required = false) String category,
-            @RequestParam(required = false) float calories,
+            @RequestParam(required = false) Double minCalories,
+            @RequestParam(required = false) Double maxCalories,
+            @RequestParam(required = false) String ingredient,
             @PageableDefault(size = 10) Pageable pageable
     ) throws NotFoundException {
-        return mealService.filterMeals(name, category, calories, pageable);
+        return mealService.filterMeals(category, mealName, minCalories, maxCalories, ingredient, pageable);
     }
 }

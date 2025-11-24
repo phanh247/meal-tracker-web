@@ -2,6 +2,9 @@
 
 A comprehensive Spring Boot application for tracking meals and nutritional information with JWT authentication.
 
+## Database
+Link: https://app.diagrams.net/#G1Btwkklp3seC7DrvXCmJ66wegoclScq9O#%7B%22pageId%22%3A%22vcllqK506OVeHguMUkUp%22%7D
+
 ## Technology Stack
 
 - **Backend**: Spring Boot 3.2.0

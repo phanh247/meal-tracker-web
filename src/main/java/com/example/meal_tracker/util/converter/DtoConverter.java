@@ -1,5 +1,6 @@
-package com.example.meal_tracker.util;
+package com.example.meal_tracker.util.converter;
 
+import com.example.meal_tracker.dto.MealInstruction;
 import com.example.meal_tracker.dto.request.AddMealPlanRequest;
 import com.example.meal_tracker.dto.request.AddMealRequest;
 import com.example.meal_tracker.dto.response.CategoryResponse;
@@ -8,17 +9,29 @@ import com.example.meal_tracker.dto.response.MealResponse;
 import com.example.meal_tracker.entity.Category;
 import com.example.meal_tracker.entity.Meal;
 import com.example.meal_tracker.entity.MealPlan;
+import com.example.meal_tracker.exception.ConvertFailException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-public final class ConverterUtil {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public final class DtoConverter {
+
+    private static final ObjectMapper mapper = new ObjectMapper();
+
     public static Meal convertToEntity(AddMealRequest request) {
-        long now = System.currentTimeMillis();
         return Meal.builder()
                 .name(request.getMealName())
                 .description(request.getMealDescription())
-                .imageUrl(request.getMealImageUrl())
                 .calories(request.getCalories())
-                .createdAt(now)
-                .updatedAt(now)
+                .imageUrl(request.getMealImageUrl())
+                .mealInstructions(request.getMealInstructions())
+                .cookingTime(request.getCookingTime())
+                .servings(request.getServings())
+                .nutrition(request.getNutrition())
                 .build();
     }
 
@@ -32,15 +45,22 @@ public final class ConverterUtil {
     }
 
     public static MealResponse convertToDto(Meal meal) {
+        // Get category name
+        List<String> categoryNames = meal.getCategories().stream()
+                .map(Category::getName)
+                .collect(Collectors.toList());
+
         return MealResponse.builder()
                 .id(meal.getId())
                 .name(meal.getName())
-                .imageUrl(meal.getImageUrl())
-                .calories(meal.getCalories())
-                .categoryName(meal.getCategory().getName())
                 .description(meal.getDescription())
-                .createdAt(meal.getCreatedAt())
-                .updatedAt(meal.getUpdatedAt())
+                .calories(meal.getCalories())
+                .imageUrl(meal.getImageUrl())
+                .mealInstructions(meal.getMealInstructions())
+                .cookingTime(meal.getCookingTime())
+                .servings(meal.getServings())
+                .nutrition(meal.getNutrition())
+                .categoryName(categoryNames)
                 .build();
     }
 

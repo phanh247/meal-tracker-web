@@ -2,6 +2,7 @@ package com.example.meal_tracker.service;
 
 import com.example.meal_tracker.dto.request.AddMealRequest;
 import com.example.meal_tracker.dto.response.MealResponse;
+import com.example.meal_tracker.exception.ConvertFailException;
 import com.example.meal_tracker.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

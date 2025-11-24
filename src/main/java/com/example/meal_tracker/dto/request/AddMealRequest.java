@@ -24,9 +24,6 @@ public class AddMealRequest implements Serializable {
     @JsonProperty("calories")
     private float calories;
 
-    @JsonProperty("image_url")
-    private String mealImageUrl;
-
     @JsonProperty("meal_instruction")
     private List<MealInstruction> mealInstructions;
 
@@ -49,7 +46,6 @@ public class AddMealRequest implements Serializable {
                 ", mealName='" + mealName + '\'' +
                 ", categoryName='" + categoryName + '\'' +
                 ", mealDescription='" + mealDescription + '\'' +
-                ", mealImageUrl='" + mealImageUrl + '\'' +
                 '}';
     }
 }

@@ -1,6 +1,5 @@
 package com.example.meal_tracker.util.converter;
 
-import com.example.meal_tracker.dto.MealInstruction;
 import com.example.meal_tracker.dto.request.AddMealPlanRequest;
 import com.example.meal_tracker.dto.request.AddMealRequest;
 import com.example.meal_tracker.dto.response.CategoryResponse;
@@ -9,25 +8,17 @@ import com.example.meal_tracker.dto.response.MealResponse;
 import com.example.meal_tracker.entity.Category;
 import com.example.meal_tracker.entity.Meal;
 import com.example.meal_tracker.entity.MealPlan;
-import com.example.meal_tracker.exception.ConvertFailException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public final class DtoConverter {
-
-    private static final ObjectMapper mapper = new ObjectMapper();
 
     public static Meal convertToEntity(AddMealRequest request) {
         return Meal.builder()
                 .name(request.getMealName())
                 .description(request.getMealDescription())
                 .calories(request.getCalories())
-                .imageUrl(request.getMealImageUrl())
                 .mealInstructions(request.getMealInstructions())
                 .cookingTime(request.getCookingTime())
                 .servings(request.getServings())

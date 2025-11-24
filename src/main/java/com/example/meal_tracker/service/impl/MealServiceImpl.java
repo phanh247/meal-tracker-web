@@ -7,6 +7,7 @@ import com.example.meal_tracker.entity.Meal;
 import com.example.meal_tracker.exception.NotFoundException;
 import com.example.meal_tracker.repository.CategoryRepository;
 import com.example.meal_tracker.repository.MealRepository;
+import com.example.meal_tracker.service.ImageUploadService;
 import com.example.meal_tracker.service.MealService;
 import com.example.meal_tracker.specification.MealSpecification;
 import com.example.meal_tracker.util.converter.DtoConverter;
@@ -20,7 +21,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -36,9 +39,11 @@ public class MealServiceImpl implements MealService {
 
     private final MealRepository mealRepository;
     private final CategoryRepository categoryRepository;
+    private final ImageUploadService imageUploadService;
 
     @Override
-    public MealResponse addNewMeal(AddMealRequest request) throws NotFoundException {
+    public MealResponse addNewMeal(AddMealRequest request, MultipartFile imageFile)
+    throws NotFoundException, IOException {
         // Check whether categories existed or not
         for (String category : request.getCategoryName()) {
             if (categoryRepository.findByName(category).isEmpty()) {
@@ -47,7 +52,11 @@ public class MealServiceImpl implements MealService {
             }
         }
 
+        // Upload image to Cloudinary
+        String imageUrl = imageUploadService.upload(imageFile);
+
         Meal meal = DtoConverter.convertToEntity(request);
+        meal.setImageUrl(imageUrl);
         Set<Category> mealCategories = new HashSet<>();
         for (String name : request.getCategoryName()) {
             Category category = categoryRepository.findByName(name)
@@ -78,7 +87,7 @@ public class MealServiceImpl implements MealService {
         Optional<Meal> meal = checkMealExists(id);
         Meal existingMeal = meal.get();
         existingMeal.setName(request.getMealName());
-        existingMeal.setImageUrl(request.getMealImageUrl());
+//        existingMeal.setImageUrl(request.getMealImageUrl());
         existingMeal.setCalories(request.getCalories());
         existingMeal.setDescription(request.getMealDescription());
 

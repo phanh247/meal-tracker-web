@@ -38,7 +38,7 @@ public class Meal implements Serializable {
     @Id
     @Column(name = "meal_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "meal_name", nullable = false)
     private String name;

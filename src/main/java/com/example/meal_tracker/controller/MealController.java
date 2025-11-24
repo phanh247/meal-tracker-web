@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/meal")
@@ -112,5 +113,13 @@ public class MealController {
         Page<MealResponse> result = mealService.filterMeals(category, mealName, minCalories, maxCalories, ingredient,
                 pageable);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/{mealId}/recommendations")
+    public ResponseEntity<List<MealResponse>> getRecommendations(@PathVariable Long mealId,
+                                                                 @RequestParam(defaultValue = "5") int limit)
+    throws NotFoundException {
+        List<MealResponse> recommendations = mealService.recommendSimilarMeals(mealId, limit);
+        return ResponseEntity.ok(recommendations);
     }
 }

@@ -25,8 +25,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.example.meal_tracker.common.ErrorConstant.CATEGORY_NOT_FOUND;
 import static com.example.meal_tracker.common.ErrorConstant.MEAL_NOT_FOUND;
@@ -115,6 +117,27 @@ public class MealServiceImpl implements MealService {
 
         // Convert each Meal to MealResponse
         return result.map(DtoConverter::convertToDto);
+    }
+
+    @Override
+    public List<MealResponse> recommendSimilarMeals(Long mealId, int limit) throws NotFoundException {
+        Meal meal = mealRepository.findById(mealId).orElseThrow(() -> new NotFoundException("Meal not found"));
+
+        // Get category name
+        List<String> categoryNames = meal.getCategories()
+                .stream()
+                .map(Category::getName)
+                .toList();
+
+        // Find similar meals to mealId
+        List<Meal> similarMeals = mealRepository.findSimilarMeals(categoryNames, mealId)
+                .stream()
+                .limit(limit)
+                .toList();
+
+        return similarMeals.stream()
+                .map(DtoConverter::convertToDto)
+                .toList();
     }
 
     private Optional<Meal> checkMealExists(Long id) throws NotFoundException {

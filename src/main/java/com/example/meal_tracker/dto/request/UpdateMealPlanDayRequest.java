@@ -13,4 +13,5 @@ public class UpdateMealPlanDayRequest implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public Long mealPlanId;
+    public String date;
 }

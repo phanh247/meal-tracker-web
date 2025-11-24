@@ -8,6 +8,7 @@ import com.example.meal_tracker.dto.request.UpdateMealPlanDayRequest;
 import com.example.meal_tracker.dto.response.CategoryResponse;
 import com.example.meal_tracker.dto.response.MealPlanResponse;
 import com.example.meal_tracker.dto.response.MealPlanDayResponse;
+import com.example.meal_tracker.entity.Meal;
 import com.example.meal_tracker.entity.MealPlan;
 import com.example.meal_tracker.entity.MealPlanDay;
 import com.example.meal_tracker.repository.MealPlanRepository;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import static com.example.meal_tracker.common.ErrorConstant.MEAL_PLAN_NOT_FOUND;
 
+import java.sql.Date;
 import java.util.Optional;
 
 @Service
@@ -58,19 +60,33 @@ public class MealPlanDayServiceImpl implements MealPlanDayService {
 
     @SuppressWarnings("null")
     @Override
-    public void updateMealPlanDay(Long mealPlanId, UpdateMealPlanDayRequest updateMealPlanRequest)
+    public void updateMealPlanDay(Long mealPlanDayId, UpdateMealPlanDayRequest request)
             throws BadRequestException {
 
-        if (mealPlanRepository.findById(mealPlanId).isEmpty()) {
-            LOGGER.info(MEAL_PLAN_NOT_FOUND, mealPlanId);
-            throw new BadRequestException(String.format(MEAL_PLAN_NOT_FOUND, mealPlanId));
+        // check if meal plan id exists
+        if (mealPlanRepository.findById(request.mealPlanId).isEmpty()) {
+            LOGGER.info("Meal plan with id '{}' not found.", request.mealPlanId);
+            throw new BadRequestException(String.format(ErrorConstant.MEAL_PLAN_NOT_FOUND, request.mealPlanId));
         }
 
-        mealPlanRepository.findById(mealPlanId).map(mealPlan -> {
-            mealPlan.setName(updateMealPlanRequest.getMealPlanName());
-            mealPlan.setIsSuggested(updateMealPlanRequest.getIsSuggested());
-            return mealPlanRepository.save(mealPlan);
-        });
+        // Tìm mealPlanDay có mealPlanId đó
+        Optional<MealPlanDay> mealPlanDay = mealPlanDayRepository.findById(mealPlanDayId);
+
+        // Kiểm tra mealPlanDayId
+        if (mealPlanDay.isEmpty()) {
+            // Log thông tin
+            LOGGER.info("Meal plan day with id '{}' not found.", mealPlanDayId);
+            // Trả lỗi
+            throw new BadRequestException(String.format(ErrorConstant.MEAL_PLAN_DAY_NOT_FOUND, mealPlanDayId));
+        }
+
+        // cập nhật lại giá trị mới
+        MealPlanDay existingMealPlanDay = mealPlanDay.get();
+        existingMealPlanDay.setDate(Date.valueOf(request.getDate()));
+        existingMealPlanDay.setMealPlanId(request.getMealPlanId());
+
+        // lưu lại giá trị mới xuống db
+        mealPlanDayRepository.save(existingMealPlanDay);
 
     }
 

@@ -2,6 +2,7 @@ package com.example.meal_tracker.controller;
 
 import com.example.meal_tracker.dto.request.AddMealRequest;
 import com.example.meal_tracker.dto.response.MealResponse;
+import com.example.meal_tracker.exception.ConvertFailException;
 import com.example.meal_tracker.exception.InvalidDataException;
 import com.example.meal_tracker.exception.NotFoundException;
 import com.example.meal_tracker.service.MealService;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -24,7 +26,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/meal")
@@ -34,22 +40,25 @@ public class MealController {
 
     private final MealService mealService;
 
-    @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> addNewMeal(@RequestBody @Valid AddMealRequest request) {
+    @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> addNewMeal(@RequestPart("data") AddMealRequest request,
+                                        @RequestPart("image") MultipartFile imageFile) {
         try {
             LOGGER.info("Received request to add new meal: {}", request);
             RequestValidator.validateRequest(request);
-            MealResponse response = mealService.addNewMeal(request);
+            MealResponse response = mealService.addNewMeal(request, imageFile);
             return ResponseEntity.ok(response);
-        } catch (InvalidDataException | NotFoundException e) {
+        } catch (InvalidDataException | NotFoundException | IOException e ) {
             LOGGER.error("Error adding new meal: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<MealResponse>> getMeals(@PageableDefault(size = 10) Pageable pageable) {
+    public ResponseEntity<Page<MealResponse>> getMeals(@RequestParam(defaultValue = "0") int page,
+                                                       @RequestParam(defaultValue = "10") int size) {
         LOGGER.info("Received request to get all meals");
+        Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(mealService.getMeals(pageable));
     }
 
@@ -92,14 +101,16 @@ public class MealController {
     }
 
     @GetMapping("/filter")
-    public Page<MealResponse> filterMeals(
+    public ResponseEntity<Page<MealResponse>> filterMeals(
             @RequestParam(required = false) String mealName,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) Double minCalories,
             @RequestParam(required = false) Double maxCalories,
             @RequestParam(required = false) String ingredient,
-            @PageableDefault(size = 10) Pageable pageable
+            @PageableDefault() Pageable pageable
     ) throws NotFoundException {
-        return mealService.filterMeals(category, mealName, minCalories, maxCalories, ingredient, pageable);
+        Page<MealResponse> result = mealService.filterMeals(category, mealName, minCalories, maxCalories, ingredient,
+                pageable);
+        return ResponseEntity.ok(result);
     }
 }

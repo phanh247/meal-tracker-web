@@ -1,18 +1,27 @@
 package com.example.meal_tracker.specification;
 
+import com.example.meal_tracker.entity.Category;
 import com.example.meal_tracker.entity.Meal;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 
 public class MealSpecification {
 
     public static Specification<Meal> hasName(String name) {
+        if (name == null || name.isBlank()) return null;
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%");
     }
 
     public static Specification<Meal> hasCategoryName(String categoryName) {
-        return (root, query, criteriaBuilder) ->
-                criteriaBuilder.equal(criteriaBuilder.lower(root.get("category").get("name")), categoryName.toLowerCase());
+        if (categoryName == null || categoryName.isBlank()) return null;
+
+        return (root, query, cb) -> {
+            // Join the categories collection
+            Join<Meal, Category> join = root.join("categories", JoinType.INNER);
+            return cb.equal(cb.lower(join.get("name")), categoryName.toLowerCase());
+        };
     }
 
     public static Specification<Meal> caloriesBetween(Double minCal, Double maxCal) {
@@ -29,7 +38,7 @@ public class MealSpecification {
 
     public static Specification<Meal> hasIngredient(String ingredient) {
         return (root, query, builder) -> ingredient == null ? null :
-                builder.like(builder.lower(root.get("ingredient")), "%" + ingredient.toLowerCase() + "%");
+                    builder.like(builder.lower(root.get("ingredient")), "%" + ingredient.toLowerCase() + "%");
     }
     
 }

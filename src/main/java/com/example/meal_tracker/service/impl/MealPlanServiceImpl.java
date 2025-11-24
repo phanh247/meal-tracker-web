@@ -3,12 +3,11 @@ package com.example.meal_tracker.service.impl;
 import com.example.meal_tracker.common.ErrorConstant;
 import com.example.meal_tracker.dto.request.AddMealPlanRequest;
 import com.example.meal_tracker.dto.request.UpdateMealPlanRequest;
-import com.example.meal_tracker.dto.response.CategoryResponse;
 import com.example.meal_tracker.dto.response.MealPlanResponse;
 import com.example.meal_tracker.entity.MealPlan;
 import com.example.meal_tracker.repository.MealPlanRepository;
 import com.example.meal_tracker.service.MealPlanService;
-import com.example.meal_tracker.util.ConverterUtil;
+import com.example.meal_tracker.util.converter.DtoConverter;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -48,9 +47,9 @@ public class MealPlanServiceImpl implements MealPlanService {
                     String.format(ErrorConstant.MEAL_PLAN_EXISTED, addMealPlanRequest.mealPlanName));
         }
 
-        MealPlan newMealPlanEntity = ConverterUtil.convertToEntity(addMealPlanRequest);
+        MealPlan newMealPlanEntity = DtoConverter.convertToEntity(addMealPlanRequest);
         mealPlanRepository.save(newMealPlanEntity);
-        return ConverterUtil.convertToDto(newMealPlanEntity);
+        return DtoConverter.convertToDto(newMealPlanEntity);
     }
 
     @SuppressWarnings("null")
@@ -85,6 +84,6 @@ public class MealPlanServiceImpl implements MealPlanService {
     public Page<MealPlanResponse> getMealPlans(Pageable pageable, Long userId) {
         pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
         Page<MealPlan> mealPlans = mealPlanRepository.findByUserId(pageable, userId);
-        return mealPlans.map(ConverterUtil::convertToDto);
+        return mealPlans.map(DtoConverter::convertToDto);
     }
 }

@@ -75,15 +75,16 @@ public class MealController {
         }
     }
 
-    @PutMapping(value = "/update/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateMeal(@PathVariable("id") Long id,
-                                           @RequestBody @Valid AddMealRequest request) {
+                                        @RequestPart("data") AddMealRequest request,
+                                        @RequestPart(value = "image", required = false) MultipartFile imageFile) {
         try {
             LOGGER.info("Received request to update meal with id: {}", id);
             RequestValidator.validateRequest(request);
-            mealService.updateMeal(id, request);
+            mealService.updateMeal(id, request, imageFile);
             return ResponseEntity.ok(true);
-        } catch (InvalidDataException | NotFoundException e) {
+        } catch (InvalidDataException | NotFoundException | IOException e) {
             LOGGER.error("Error updating meal: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }

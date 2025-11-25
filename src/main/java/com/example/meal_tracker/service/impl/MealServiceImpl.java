@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.example.meal_tracker.common.ErrorConstant.CATEGORY_NOT_FOUND;
 import static com.example.meal_tracker.common.ErrorConstant.MEAL_NOT_FOUND;
@@ -55,7 +54,7 @@ public class MealServiceImpl implements MealService {
         }
 
         // Upload image to Cloudinary
-        String imageUrl = imageUploadService.upload(imageFile);
+        String imageUrl = imageUploadService.upload(imageFile, imageFile.getOriginalFilename());
 
         Meal meal = DtoConverter.convertToEntity(request);
         meal.setImageUrl(imageUrl);
@@ -85,13 +84,21 @@ public class MealServiceImpl implements MealService {
     }
 
     @Override
-    public void updateMeal(Long id, AddMealRequest request) throws NotFoundException {
+    public void updateMeal(Long id, AddMealRequest request, MultipartFile imageFile) throws NotFoundException, IOException {
+        // Check meal existed
         Optional<Meal> meal = checkMealExists(id);
         Meal existingMeal = meal.get();
+
         existingMeal.setName(request.getMealName());
-//        existingMeal.setImageUrl(request.getMealImageUrl());
+        existingMeal.setDescription(request.getMealDescription());
+        existingMeal.setMealInstructions(request.getMealInstructions());
         existingMeal.setCalories(request.getCalories());
         existingMeal.setDescription(request.getMealDescription());
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String uploadedUrl = imageUploadService.upload(imageFile, imageFile.getOriginalFilename());
+            existingMeal.setImageUrl(uploadedUrl); // overwrite old image
+        }
 
         LOGGER.info("Updating meal with id: {}", id);
         mealRepository.save(existingMeal);

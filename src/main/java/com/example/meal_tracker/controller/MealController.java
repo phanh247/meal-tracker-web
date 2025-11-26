@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/meal")
@@ -74,15 +75,16 @@ public class MealController {
         }
     }
 
-    @PutMapping(value = "/update/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateMeal(@PathVariable("id") Long id,
-                                           @RequestBody @Valid AddMealRequest request) {
+                                        @RequestPart("data") AddMealRequest request,
+                                        @RequestPart(value = "image", required = false) MultipartFile imageFile) {
         try {
             LOGGER.info("Received request to update meal with id: {}", id);
             RequestValidator.validateRequest(request);
-            mealService.updateMeal(id, request);
+            mealService.updateMeal(id, request, imageFile);
             return ResponseEntity.ok(true);
-        } catch (InvalidDataException | NotFoundException e) {
+        } catch (InvalidDataException | NotFoundException | IOException e) {
             LOGGER.error("Error updating meal: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -112,5 +114,13 @@ public class MealController {
         Page<MealResponse> result = mealService.filterMeals(category, mealName, minCalories, maxCalories, ingredient,
                 pageable);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/{mealId}/recommendations")
+    public ResponseEntity<List<MealResponse>> getRecommendations(@PathVariable Long mealId,
+                                                                 @RequestParam(defaultValue = "5") int limit)
+    throws NotFoundException {
+        List<MealResponse> recommendations = mealService.recommendSimilarMeals(mealId, limit);
+        return ResponseEntity.ok(recommendations);
     }
 }

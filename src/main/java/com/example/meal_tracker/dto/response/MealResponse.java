@@ -16,7 +16,7 @@ public class MealResponse implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @JsonProperty("id")
-    private Integer id;
+    private Long id;
 
     @JsonProperty("meal_name")
     private String name;

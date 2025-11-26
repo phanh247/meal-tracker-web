@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -53,7 +54,7 @@ public class MealServiceImpl implements MealService {
         }
 
         // Upload image to Cloudinary
-        String imageUrl = imageUploadService.upload(imageFile);
+        String imageUrl = imageUploadService.upload(imageFile, imageFile.getOriginalFilename());
 
         Meal meal = DtoConverter.convertToEntity(request);
         meal.setImageUrl(imageUrl);
@@ -83,13 +84,21 @@ public class MealServiceImpl implements MealService {
     }
 
     @Override
-    public void updateMeal(Long id, AddMealRequest request) throws NotFoundException {
+    public void updateMeal(Long id, AddMealRequest request, MultipartFile imageFile) throws NotFoundException, IOException {
+        // Check meal existed
         Optional<Meal> meal = checkMealExists(id);
         Meal existingMeal = meal.get();
+
         existingMeal.setName(request.getMealName());
-//        existingMeal.setImageUrl(request.getMealImageUrl());
+        existingMeal.setDescription(request.getMealDescription());
+        existingMeal.setMealInstructions(request.getMealInstructions());
         existingMeal.setCalories(request.getCalories());
         existingMeal.setDescription(request.getMealDescription());
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String uploadedUrl = imageUploadService.upload(imageFile, imageFile.getOriginalFilename());
+            existingMeal.setImageUrl(uploadedUrl); // overwrite old image
+        }
 
         LOGGER.info("Updating meal with id: {}", id);
         mealRepository.save(existingMeal);
@@ -115,6 +124,27 @@ public class MealServiceImpl implements MealService {
 
         // Convert each Meal to MealResponse
         return result.map(DtoConverter::convertToDto);
+    }
+
+    @Override
+    public List<MealResponse> recommendSimilarMeals(Long mealId, int limit) throws NotFoundException {
+        Meal meal = mealRepository.findById(mealId).orElseThrow(() -> new NotFoundException("Meal not found"));
+
+        // Get category name
+        List<String> categoryNames = meal.getCategories()
+                .stream()
+                .map(Category::getName)
+                .toList();
+
+        // Find similar meals to mealId
+        List<Meal> similarMeals = mealRepository.findSimilarMeals(categoryNames, mealId)
+                .stream()
+                .limit(limit)
+                .toList();
+
+        return similarMeals.stream()
+                .map(DtoConverter::convertToDto)
+                .toList();
     }
 
     private Optional<Meal> checkMealExists(Long id) throws NotFoundException {

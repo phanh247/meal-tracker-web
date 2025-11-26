@@ -1,4 +1,4 @@
-package com.example.meal_tracker.util;
+package com.example.meal_tracker.util.converter;
 
 import com.example.meal_tracker.dto.request.AddMealPlanRequest;
 
@@ -15,16 +15,20 @@ import com.example.meal_tracker.entity.Meal;
 import com.example.meal_tracker.entity.MealPlan;
 import com.example.meal_tracker.entity.MealPlanDay;
 
-public final class ConverterUtil {
+import java.util.List;
+import java.util.stream.Collectors;
+
+public final class DtoConverter {
+
     public static Meal convertToEntity(AddMealRequest request) {
-        long now = System.currentTimeMillis();
         return Meal.builder()
                 .name(request.getMealName())
                 .description(request.getMealDescription())
-                .imageUrl(request.getMealImageUrl())
                 .calories(request.getCalories())
-                .createdAt(now)
-                .updatedAt(now)
+                .mealInstructions(request.getMealInstructions())
+                .cookingTime(request.getCookingTime())
+                .servings(request.getServings())
+                .nutrition(request.getNutrition())
                 .build();
     }
 
@@ -38,15 +42,22 @@ public final class ConverterUtil {
     }
 
     public static MealResponse convertToDto(Meal meal) {
+        // Get category name
+        List<String> categoryNames = meal.getCategories().stream()
+                .map(Category::getName)
+                .collect(Collectors.toList());
+
         return MealResponse.builder()
                 .id(meal.getId())
                 .name(meal.getName())
-                .imageUrl(meal.getImageUrl())
-                .calories(meal.getCalories())
-                .categoryName(meal.getCategory().getName())
                 .description(meal.getDescription())
-                .createdAt(meal.getCreatedAt())
-                .updatedAt(meal.getUpdatedAt())
+                .calories(meal.getCalories())
+                .imageUrl(meal.getImageUrl())
+                .mealInstructions(meal.getMealInstructions())
+                .cookingTime(meal.getCookingTime())
+                .servings(meal.getServings())
+                .nutrition(meal.getNutrition())
+                .categoryName(categoryNames)
                 .build();
     }
 

@@ -1,5 +1,6 @@
 package com.example.meal_tracker.entity;
 
+import jakarta.persistence.*;
 import com.example.meal_tracker.dto.MealInstruction;
 import com.example.meal_tracker.util.converter.MealInstructionConverter;
 import com.example.meal_tracker.util.converter.StringListConverter;
@@ -23,6 +24,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.List;
 import java.util.Set;
 
@@ -80,4 +83,8 @@ public class Meal implements Serializable {
 //    @ManyToOne(fetch = FetchType.EAGER)
 //    @JoinColumn(name = "user_id", nullable = false)
 //    private Author author;
+
+    @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MealIngredient> mealIngredients = new ArrayList<>();
+
 }

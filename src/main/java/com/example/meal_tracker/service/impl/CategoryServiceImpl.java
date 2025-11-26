@@ -5,7 +5,7 @@ import com.example.meal_tracker.entity.Category;
 import com.example.meal_tracker.exception.CategoryManagementException;
 import com.example.meal_tracker.repository.CategoryRepository;
 import com.example.meal_tracker.service.CategoryService;
-import com.example.meal_tracker.util.ConverterUtil;
+import com.example.meal_tracker.util.converter.DtoConverter;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -37,16 +37,16 @@ public class CategoryServiceImpl implements CategoryService {
             throw new CategoryManagementException(String.format(CATEGORY_EXISTED, categoryName));
         }
 
-        Category category = ConverterUtil.convertToEntity(categoryName);
+        Category category = DtoConverter.convertToEntity(categoryName);
         categoryRepository.save(category);
-        return ConverterUtil.convertToDto(category);
+        return DtoConverter.convertToDto(category);
     }
 
     @Override
     public Page<CategoryResponse> getAllCategories(Pageable pageable) {
         pageable = PageRequest.of(0, 10, Sort.by("id"));
         Page<Category> categories = categoryRepository.findAll(pageable);
-        return categories.map(ConverterUtil::convertToDto);
+        return categories.map(DtoConverter::convertToDto);
     }
 
     @Override

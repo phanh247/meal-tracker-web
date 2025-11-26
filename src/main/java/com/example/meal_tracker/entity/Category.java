@@ -1,5 +1,6 @@
 package com.example.meal_tracker.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,12 +29,16 @@ public class Category implements Serializable {
     @Column(name = "category_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "category_name", nullable = false, unique = true)
     private String name;
+
     @Column(name = "created_at", nullable = false)
     private Long createdAt;
+
     @Column(name = "updated_at")
     private Long updatedAt;
-    @OneToMany(mappedBy = "category")
-    private List<Meal> meals;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private List<MealCategory> categories;
 }

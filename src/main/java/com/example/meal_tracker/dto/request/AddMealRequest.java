@@ -21,8 +21,8 @@ public class AddMealRequest implements Serializable {
     @JsonProperty("meal_description")
     private String mealDescription;
 
-    @JsonProperty("calories")
-    private float calories;
+    @JsonProperty("meal_ingredients")
+    private List<String> mealIngredients;
 
     @JsonProperty("meal_instruction")
     private List<MealInstruction> mealInstructions;
@@ -42,10 +42,14 @@ public class AddMealRequest implements Serializable {
     @Override
     public String toString() {
         return "AddMealRequest{" +
-                "calories=" + calories +
+                "categoryName=" + categoryName +
                 ", mealName='" + mealName + '\'' +
-                ", categoryName='" + categoryName + '\'' +
                 ", mealDescription='" + mealDescription + '\'' +
+                ", mealIngredients=" + mealIngredients +
+                ", mealInstructions=" + mealInstructions +
+                ", cookingTime='" + cookingTime + '\'' +
+                ", servings=" + servings +
+                ", nutrition=" + nutrition +
                 '}';
     }
 }

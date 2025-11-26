@@ -69,8 +69,11 @@ public class Meal implements Serializable {
     @Convert(converter = StringListConverter.class)
     private List<String> nutrition;
 
-//    @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<MealIngredient> ingredients;
+    @Column(name = "created_at")
+    private Long createdAt;
+
+    @Column(name = "updated_at")
+    private Long updatedAt;
 
     @ManyToMany
     @JoinTable(

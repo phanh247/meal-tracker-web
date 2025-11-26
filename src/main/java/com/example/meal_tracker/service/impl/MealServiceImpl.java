@@ -3,11 +3,14 @@ package com.example.meal_tracker.service.impl;
 import com.example.meal_tracker.dto.request.AddMealRequest;
 import com.example.meal_tracker.dto.response.MealResponse;
 import com.example.meal_tracker.entity.Category;
+import com.example.meal_tracker.entity.Ingredient;
 import com.example.meal_tracker.entity.Meal;
 import com.example.meal_tracker.exception.NotFoundException;
 import com.example.meal_tracker.repository.CategoryRepository;
+import com.example.meal_tracker.repository.IngredientRepository;
 import com.example.meal_tracker.repository.MealRepository;
 import com.example.meal_tracker.service.ImageUploadService;
+import com.example.meal_tracker.service.IngredientService;
 import com.example.meal_tracker.service.MealService;
 import com.example.meal_tracker.specification.MealSpecification;
 import com.example.meal_tracker.util.converter.DtoConverter;
@@ -24,12 +27,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import static com.example.meal_tracker.common.ErrorConstant.CATEGORY_NOT_FOUND;
+import static com.example.meal_tracker.common.ErrorConstant.INGREDIENT_NOT_FOUND;
 import static com.example.meal_tracker.common.ErrorConstant.MEAL_NOT_FOUND;
 
 @Service
@@ -40,31 +45,47 @@ public class MealServiceImpl implements MealService {
 
     private final MealRepository mealRepository;
     private final CategoryRepository categoryRepository;
+    private final IngredientRepository ingredientRepository;
     private final ImageUploadService imageUploadService;
 
     @Override
     public MealResponse addNewMeal(AddMealRequest request, MultipartFile imageFile)
     throws NotFoundException, IOException {
+
         // Check whether categories existed or not
-        for (String category : request.getCategoryName()) {
-            if (categoryRepository.findByName(category).isEmpty()) {
-                LOGGER.info("Category with name '{}' does not exist.", request.getCategoryName());
-                throw new NotFoundException(String.format(CATEGORY_NOT_FOUND, request.getCategoryName()));
+        Set<Category> mealCategories = new HashSet<>();
+        for (String name : request.getCategoryName()) {
+            Category category = categoryRepository.findByName(name)
+                    .orElseThrow(() -> new NotFoundException(CATEGORY_NOT_FOUND + name));
+            mealCategories.add(category);
+        }
+
+        // Check ingredients and calculate calories
+        float totalCalories = 0;
+        List<Ingredient> mealIngredients = new ArrayList<>();
+        for (String ingredientName : request.getMealIngredients()) {
+            Optional<Ingredient> ingredient = ingredientRepository.findByName(ingredientName);
+            if (ingredient.isEmpty()) {
+                LOGGER.info("Ingredient with name '{}' does not exist.", ingredientName);
+                throw new NotFoundException(String.format(INGREDIENT_NOT_FOUND, ingredientName));
             }
+            mealIngredients.add(ingredient.get());
+
+            // Calculate calories
+            float ingredientCalories = ingredient.get().getCalories();
+            totalCalories += ingredientCalories;
         }
 
         // Upload image to Cloudinary
         String imageUrl = imageUploadService.upload(imageFile, imageFile.getOriginalFilename());
 
-        Meal meal = DtoConverter.convertToEntity(request);
-        meal.setImageUrl(imageUrl);
-        Set<Category> mealCategories = new HashSet<>();
-        for (String name : request.getCategoryName()) {
-            Category category = categoryRepository.findByName(name)
-                    .orElseThrow(() -> new NotFoundException("Category not found: " + name));
-            mealCategories.add(category);
-        }
-        meal.setCategories(mealCategories);
+        Meal meal = Meal.builder()
+                .name(request.getMealName())
+                .description(request.getMealDescription())
+                .calories(totalCalories)
+                .imageUrl(imageUrl)
+                .mealIngredients(mealIngredients).build()
+
         mealRepository.save(meal);
 
         return DtoConverter.convertToDto(meal);

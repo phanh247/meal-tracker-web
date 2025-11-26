@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 public final class DtoConverter {
 
     public static Meal convertToEntity(AddMealRequest request) {
+        long now = System.currentTimeMillis();
         return Meal.builder()
                 .name(request.getMealName())
                 .description(request.getMealDescription())
@@ -23,6 +24,8 @@ public final class DtoConverter {
                 .cookingTime(request.getCookingTime())
                 .servings(request.getServings())
                 .nutrition(request.getNutrition())
+                .createdAt(now)
+                .updatedAt(now)
                 .build();
     }
 

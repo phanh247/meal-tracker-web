@@ -3,6 +3,7 @@ package com.example.meal_tracker.controller;
 import com.example.meal_tracker.dto.request.AddMealPlanDayRequest;
 import com.example.meal_tracker.dto.request.UpdateMealPlanDayRequest;
 import com.example.meal_tracker.dto.response.MealPlanDayResponse;
+import com.example.meal_tracker.dto.response.MealPlanResponse;
 import com.example.meal_tracker.exception.InvalidDataException;
 import com.example.meal_tracker.service.MealPlanDayService;
 import com.example.meal_tracker.util.RequestValidator;
@@ -72,5 +73,12 @@ public class MealPlanDayController {
             LOGGER.error("Error deleting meal plan day: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
+    }
+
+    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Page<MealPlanDayResponse>> getMealPlanDays(Pageable pageable,
+            Long mealPlanId) {
+        LOGGER.info("Received request to get all meal plan day {} {}", pageable.toString(), mealPlanId);
+        return ResponseEntity.ok(mealPlanDayService.getMealPlanDays(pageable, mealPlanId));
     }
 }

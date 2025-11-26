@@ -27,6 +27,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import static com.example.meal_tracker.common.ErrorConstant.MEAL_PLAN_DAY_NOT_FOUND;
 import static com.example.meal_tracker.common.ErrorConstant.MEAL_PLAN_NOT_FOUND;
 
 import java.sql.Date;
@@ -87,23 +88,21 @@ public class MealPlanDayServiceImpl implements MealPlanDayService {
 
         // lưu lại giá trị mới xuống db
         mealPlanDayRepository.save(existingMealPlanDay);
-
     }
 
-    @SuppressWarnings("null")
+    @Override
+    public Page<MealPlanDayResponse> getMealPlans(Pageable pageable, Long mealPlanId) {
+        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+        Page<MealPlanDay> mealPlanDays = mealPlanDayRepository.findByMealPlanId(pageable, mealPlanId);
+        return mealPlanDays.map(ConverterUtil::convertToDto);
+    }
+
     @Override
     public void deleteMealPlanDay(Long mealPlanDayId) throws BadRequestException {
         if (mealPlanDayRepository.findById(mealPlanDayId).isEmpty()) {
             LOGGER.info(MEAL_PLAN_DAY_NOT_FOUND, mealPlanDayId);
-            throw new BadRequestException(String.format(MEAL_PLAN_NOT_FOUND, mealPlanDayId));
+            throw new BadRequestException(String.format(MEAL_PLAN_DAY_NOT_FOUND, mealPlanDayId));
         }
-        mealPlanRepository.deleteById(mealPlanDayId);
-    }
-
-    @Override
-    public Page<MealPlanDayResponse> getMealPlans(Pageable pageable, Long userId) {
-        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
-        Page<MealPlan> mealPlans = mealPlanRepository.findByUserId(pageable, userId);
-        return mealPlans.map(ConverterUtil::convertToDto);
-    }
+        mealPlanDayRepository.deleteById(mealPlanDayId);
+    };
 }

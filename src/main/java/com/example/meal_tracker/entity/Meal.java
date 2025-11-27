@@ -1,5 +1,6 @@
 package com.example.meal_tracker.entity;
 
+import com.example.meal_tracker.dto.MealIngredients;
 import jakarta.persistence.*;
 import com.example.meal_tracker.dto.MealInstruction;
 import com.example.meal_tracker.util.converter.MealInstructionConverter;

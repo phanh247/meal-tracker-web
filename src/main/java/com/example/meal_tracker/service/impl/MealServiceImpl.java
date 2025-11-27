@@ -1,16 +1,17 @@
 package com.example.meal_tracker.service.impl;
 
+import com.example.meal_tracker.dto.MealIngredients;
 import com.example.meal_tracker.dto.request.AddMealRequest;
 import com.example.meal_tracker.dto.response.MealResponse;
 import com.example.meal_tracker.entity.Category;
 import com.example.meal_tracker.entity.Ingredient;
 import com.example.meal_tracker.entity.Meal;
+import com.example.meal_tracker.entity.MealIngredient;
 import com.example.meal_tracker.exception.NotFoundException;
 import com.example.meal_tracker.repository.CategoryRepository;
 import com.example.meal_tracker.repository.IngredientRepository;
 import com.example.meal_tracker.repository.MealRepository;
 import com.example.meal_tracker.service.ImageUploadService;
-import com.example.meal_tracker.service.IngredientService;
 import com.example.meal_tracker.service.MealService;
 import com.example.meal_tracker.specification.MealSpecification;
 import com.example.meal_tracker.util.converter.DtoConverter;
@@ -62,29 +63,48 @@ public class MealServiceImpl implements MealService {
 
         // Check ingredients and calculate calories
         float totalCalories = 0;
-        List<Ingredient> mealIngredients = new ArrayList<>();
-        for (String ingredientName : request.getMealIngredients()) {
-            Optional<Ingredient> ingredient = ingredientRepository.findByName(ingredientName);
+        List<MealIngredient> mealIngredients = new ArrayList<>();
+        for (MealIngredients mi : request.getMealIngredients()) {
+            Optional<Ingredient> ingredient = ingredientRepository.findByName(mi.getIngredientName());
             if (ingredient.isEmpty()) {
-                LOGGER.info("Ingredient with name '{}' does not exist.", ingredientName);
-                throw new NotFoundException(String.format(INGREDIENT_NOT_FOUND, ingredientName));
+                LOGGER.info("Ingredient with name '{}' does not exist.", mi.getIngredientName());
+                throw new NotFoundException(String.format(INGREDIENT_NOT_FOUND, mi.getIngredientName()));
             }
-            mealIngredients.add(ingredient.get());
+
+            // Create join record
+            MealIngredient mealIngredient = MealIngredient.builder()
+                    .ingredient(ingredient.get())
+                    .quantity(mi.getQuantity())
+                    .build();
+            mealIngredients.add(mealIngredient);
 
             // Calculate calories
             float ingredientCalories = ingredient.get().getCalories();
-            totalCalories += ingredientCalories;
+            totalCalories += (ingredientCalories * mi.getQuantity());
         }
 
         // Upload image to Cloudinary
         String imageUrl = imageUploadService.upload(imageFile, imageFile.getOriginalFilename());
 
+        long now = System.currentTimeMillis();
         Meal meal = Meal.builder()
                 .name(request.getMealName())
                 .description(request.getMealDescription())
                 .calories(totalCalories)
                 .imageUrl(imageUrl)
-                .mealIngredients(mealIngredients).build()
+                .mealIngredients(mealIngredients)
+                .mealInstructions(request.getMealInstructions())
+                .nutrition(request.getNutrition())
+                .cookingTime(request.getCookingTime())
+                .servings(request.getServings())
+                .categories(mealCategories)
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
+
+        for (MealIngredient mi : mealIngredients) {
+            mi.setMeal(meal);
+        }
 
         mealRepository.save(meal);
 
@@ -113,7 +133,7 @@ public class MealServiceImpl implements MealService {
         existingMeal.setName(request.getMealName());
         existingMeal.setDescription(request.getMealDescription());
         existingMeal.setMealInstructions(request.getMealInstructions());
-        existingMeal.setCalories(request.getCalories());
+//        existingMeal.setCalories(request.getCalories());
         existingMeal.setDescription(request.getMealDescription());
 
         if (imageFile != null && !imageFile.isEmpty()) {

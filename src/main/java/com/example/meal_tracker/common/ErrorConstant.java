@@ -8,6 +8,7 @@ public final class ErrorConstant {
     public static final String INVALID_CATEGORY_NAME_PARAM = "Category name cannot be null or empty";
     public static final String CATEGORY_EXISTED = "Category with name %s already exists";
     public static final String CATEGORY_NOT_FOUND = "Category with name %s not found.";
+    public static final String INGREDIENT_NOT_FOUND = "Ingredient with name %s not found.";
 
     public static final String DATABASE_ERROR = "Database error occurred";
     public static final String INVALID_REQUEST_DATA = "Invalid request data";

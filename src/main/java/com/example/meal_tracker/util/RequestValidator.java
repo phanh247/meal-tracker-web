@@ -20,9 +20,6 @@ public class RequestValidator {
         if (request.getMealName() == null || request.getMealName().isEmpty()) {
             throw new InvalidDataException(ErrorConstant.INVALID_MEAL_NAME_PARAM);
         }
-        if (request.getCalories() < 0) {
-            throw new InvalidDataException(INVALID_CALORIES_PARAM);
-        }
     }
 
     public static void validateRequest(AddCategoryRequest request) throws InvalidDataException {

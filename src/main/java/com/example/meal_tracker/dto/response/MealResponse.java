@@ -1,5 +1,6 @@
 package com.example.meal_tracker.dto.response;
 
+import com.example.meal_tracker.dto.MealIngredients;
 import com.example.meal_tracker.dto.MealInstruction;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -29,6 +30,9 @@ public class MealResponse implements Serializable {
 
     @JsonProperty("image_url")
     private String imageUrl;
+
+    @JsonProperty("meal_ingredients")
+    private List<MealIngredients> mealIngredients;
 
     @JsonProperty("meal_instructions")
     private List<MealInstruction> mealInstructions;

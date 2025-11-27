@@ -1,5 +1,6 @@
 package com.example.meal_tracker.entity;
 
+import com.example.meal_tracker.dto.MealIngredients;
 import jakarta.persistence.*;
 import com.example.meal_tracker.dto.MealInstruction;
 import com.example.meal_tracker.util.converter.MealInstructionConverter;
@@ -69,8 +70,11 @@ public class Meal implements Serializable {
     @Convert(converter = StringListConverter.class)
     private List<String> nutrition;
 
-//    @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<MealIngredient> ingredients;
+    @Column(name = "created_at")
+    private Long createdAt;
+
+    @Column(name = "updated_at")
+    private Long updatedAt;
 
     @ManyToMany
     @JoinTable(

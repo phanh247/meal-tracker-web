@@ -1,5 +1,6 @@
 package com.example.meal_tracker.dto.request;
 
+import com.example.meal_tracker.dto.MealIngredients;
 import com.example.meal_tracker.dto.MealInstruction;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -21,8 +22,8 @@ public class AddMealRequest implements Serializable {
     @JsonProperty("meal_description")
     private String mealDescription;
 
-    @JsonProperty("calories")
-    private float calories;
+    @JsonProperty("meal_ingredients")
+    private List<MealIngredients> mealIngredients;
 
     @JsonProperty("meal_instruction")
     private List<MealInstruction> mealInstructions;
@@ -42,10 +43,14 @@ public class AddMealRequest implements Serializable {
     @Override
     public String toString() {
         return "AddMealRequest{" +
-                "calories=" + calories +
+                "categoryName=" + categoryName +
                 ", mealName='" + mealName + '\'' +
-                ", categoryName='" + categoryName + '\'' +
                 ", mealDescription='" + mealDescription + '\'' +
+                ", mealIngredients=" + mealIngredients +
+                ", mealInstructions=" + mealInstructions +
+                ", cookingTime='" + cookingTime + '\'' +
+                ", servings=" + servings +
+                ", nutrition=" + nutrition +
                 '}';
     }
 }

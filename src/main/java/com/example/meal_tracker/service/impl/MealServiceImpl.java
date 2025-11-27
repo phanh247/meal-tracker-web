@@ -1,11 +1,15 @@
 package com.example.meal_tracker.service.impl;
 
+import com.example.meal_tracker.dto.MealIngredients;
 import com.example.meal_tracker.dto.request.AddMealRequest;
 import com.example.meal_tracker.dto.response.MealResponse;
 import com.example.meal_tracker.entity.Category;
+import com.example.meal_tracker.entity.Ingredient;
 import com.example.meal_tracker.entity.Meal;
+import com.example.meal_tracker.entity.MealIngredient;
 import com.example.meal_tracker.exception.NotFoundException;
 import com.example.meal_tracker.repository.CategoryRepository;
+import com.example.meal_tracker.repository.IngredientRepository;
 import com.example.meal_tracker.repository.MealRepository;
 import com.example.meal_tracker.service.ImageUploadService;
 import com.example.meal_tracker.service.MealService;
@@ -24,12 +28,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import static com.example.meal_tracker.common.ErrorConstant.CATEGORY_NOT_FOUND;
+import static com.example.meal_tracker.common.ErrorConstant.INGREDIENT_NOT_FOUND;
 import static com.example.meal_tracker.common.ErrorConstant.MEAL_NOT_FOUND;
 
 @Service
@@ -40,31 +46,66 @@ public class MealServiceImpl implements MealService {
 
     private final MealRepository mealRepository;
     private final CategoryRepository categoryRepository;
+    private final IngredientRepository ingredientRepository;
     private final ImageUploadService imageUploadService;
 
     @Override
     public MealResponse addNewMeal(AddMealRequest request, MultipartFile imageFile)
     throws NotFoundException, IOException {
+
         // Check whether categories existed or not
-        for (String category : request.getCategoryName()) {
-            if (categoryRepository.findByName(category).isEmpty()) {
-                LOGGER.info("Category with name '{}' does not exist.", request.getCategoryName());
-                throw new NotFoundException(String.format(CATEGORY_NOT_FOUND, request.getCategoryName()));
+        Set<Category> mealCategories = new HashSet<>();
+        for (String name : request.getCategoryName()) {
+            Category category = categoryRepository.findByName(name)
+                    .orElseThrow(() -> new NotFoundException(CATEGORY_NOT_FOUND + name));
+            mealCategories.add(category);
+        }
+
+        // Check ingredients and calculate calories
+        float totalCalories = 0;
+        List<MealIngredient> mealIngredients = new ArrayList<>();
+        for (MealIngredients mi : request.getMealIngredients()) {
+            Optional<Ingredient> ingredient = ingredientRepository.findByName(mi.getIngredientName());
+            if (ingredient.isEmpty()) {
+                LOGGER.info("Ingredient with name '{}' does not exist.", mi.getIngredientName());
+                throw new NotFoundException(String.format(INGREDIENT_NOT_FOUND, mi.getIngredientName()));
             }
+
+            // Create join record
+            MealIngredient mealIngredient = MealIngredient.builder()
+                    .ingredient(ingredient.get())
+                    .quantity(mi.getQuantity())
+                    .build();
+            mealIngredients.add(mealIngredient);
+
+            // Calculate calories
+            float ingredientCalories = ingredient.get().getCalories();
+            totalCalories += (ingredientCalories * mi.getQuantity());
         }
 
         // Upload image to Cloudinary
         String imageUrl = imageUploadService.upload(imageFile, imageFile.getOriginalFilename());
 
-        Meal meal = DtoConverter.convertToEntity(request);
-        meal.setImageUrl(imageUrl);
-        Set<Category> mealCategories = new HashSet<>();
-        for (String name : request.getCategoryName()) {
-            Category category = categoryRepository.findByName(name)
-                    .orElseThrow(() -> new NotFoundException("Category not found: " + name));
-            mealCategories.add(category);
+        long now = System.currentTimeMillis();
+        Meal meal = Meal.builder()
+                .name(request.getMealName())
+                .description(request.getMealDescription())
+                .calories(totalCalories)
+                .imageUrl(imageUrl)
+                .mealIngredients(mealIngredients)
+                .mealInstructions(request.getMealInstructions())
+                .nutrition(request.getNutrition())
+                .cookingTime(request.getCookingTime())
+                .servings(request.getServings())
+                .categories(mealCategories)
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
+
+        for (MealIngredient mi : mealIngredients) {
+            mi.setMeal(meal);
         }
-        meal.setCategories(mealCategories);
+
         mealRepository.save(meal);
 
         return DtoConverter.convertToDto(meal);
@@ -92,7 +133,7 @@ public class MealServiceImpl implements MealService {
         existingMeal.setName(request.getMealName());
         existingMeal.setDescription(request.getMealDescription());
         existingMeal.setMealInstructions(request.getMealInstructions());
-        existingMeal.setCalories(request.getCalories());
+//        existingMeal.setCalories(request.getCalories());
         existingMeal.setDescription(request.getMealDescription());
 
         if (imageFile != null && !imageFile.isEmpty()) {

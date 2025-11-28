@@ -17,4 +17,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     // boolean existsByUsername(String username);
 
+    // Spring Data JPA tự động tạo query
+    Optional<User> findByEmail(String email);
+
 }

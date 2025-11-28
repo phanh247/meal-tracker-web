@@ -54,7 +54,7 @@ public class MealController {
 
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<MealResponse>> getMeals(@RequestParam(defaultValue = "0") int page,
-                                                       @RequestParam(defaultValue = "10") int size) {
+                                                       @RequestParam(defaultValue = "11") int size) {
         LOGGER.info("Received request to get all meals");
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(mealService.getMeals(pageable));
@@ -106,7 +106,7 @@ public class MealController {
             @RequestParam(required = false) Double minCalories,
             @RequestParam(required = false) Double maxCalories,
             @RequestParam(required = false) String ingredient,
-            @PageableDefault() Pageable pageable
+            @PageableDefault(size = 11) Pageable pageable
     ) throws NotFoundException {
         Page<MealResponse> result = mealService.filterMeals(category, mealName, minCalories, maxCalories, ingredient,
                 pageable);

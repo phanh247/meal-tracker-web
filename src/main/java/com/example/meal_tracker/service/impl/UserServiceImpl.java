@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +33,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse getUserById(Long id) throws NotFoundException {
+    public UserResponse getUserById(Integer id) throws NotFoundException {
         LOGGER.info("Fetching user with id: {}", id);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
@@ -40,7 +41,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse updateUser(Long id, UpdateUserRequest request) throws NotFoundException {
+    public UserResponse updateUser(Integer id, UpdateUserRequest request) throws NotFoundException {
         LOGGER.info("Updating user with id: {}", id);
 
         User user = userRepository.findById(id)
@@ -72,8 +73,13 @@ public class UserServiceImpl implements UserService {
             user.setGoal(request.getGoal());
         }
 
-        // BMI is automatically recalculated by @PreUpdate in User entity
-        // Daily calories are recalculated here if enough info is available
+        // ✅ FIX: Tính BMI TRƯỚC KHI SAVE để tránh phải update 2 lần
+        if (user.getHeight() != null && user.getWeight() != null && user.getHeight() > 0) {
+            double heightInMeters = user.getHeight() / 100.0;
+            user.setBmi(user.getWeight() / (heightInMeters * heightInMeters));
+        }
+
+        // Daily calories are recalculated if enough info is available
         if (user.getHeight() != null && user.getWeight() != null &&
                 user.getBirthDate() != null && user.getGender() != null) {
             user.setDailyCalories(calculateCalories(user));
@@ -86,7 +92,7 @@ public class UserServiceImpl implements UserService {
         return convertToResponse(user);
     }
 
-    // PRIVATE HELPER METHODS
+    // ========== PRIVATE HELPER METHODS ==========
 
     /**
      * Calculate daily calories using Mifflin-St Jeor Equation
@@ -140,13 +146,13 @@ public class UserServiceImpl implements UserService {
         };
     }
 
-    /*
+    /**
      * Convert User entity to UserResponse DTO
      */
     private UserResponse convertToResponse(User user) {
         return UserResponse.builder()
                 .id(user.getId())
-                .username(user.getUsername())
+                .username(user.getUsernameField()) // getUsernameField()
                 .email(user.getEmail())
                 .fullName(user.getFullName())
                 .gender(user.getGender())

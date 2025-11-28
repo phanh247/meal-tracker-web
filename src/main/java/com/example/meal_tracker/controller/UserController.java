@@ -44,7 +44,7 @@ public class UserController {
      * GET /api/users/{id}
      */
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+    public ResponseEntity<?> getUserById(@PathVariable Integer id) {
         try {
             LOGGER.info("Received request to get user with id: {}", id);
             UserResponse response = userService.getUserById(id);
@@ -63,7 +63,7 @@ public class UserController {
      */
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateUser(
-            @PathVariable Long id,
+            @PathVariable Integer id,
             @RequestBody @Valid UpdateUserRequest request) {
         try {
             LOGGER.info("Received request to update user with id: {}", id);

@@ -12,8 +12,8 @@ public interface UserService {
     Page<UserResponse> getAllUsers(Pageable pageable);
 
     // Get user by ID
-    UserResponse getUserById(Long id) throws NotFoundException;
+    UserResponse getUserById(Integer id) throws NotFoundException; // ✅ Long -> Integer
 
     // Update user information
-    UserResponse updateUser(Long id, UpdateUserRequest request) throws NotFoundException;
+    UserResponse updateUser(Integer id, UpdateUserRequest request) throws NotFoundException; // ✅ Long -> Integer
 }

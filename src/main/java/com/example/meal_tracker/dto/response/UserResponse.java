@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 public class UserResponse {
 
-    private Long id;
+    private Integer id;
     private String username;
     private String email;
     private String fullName;
@@ -32,7 +32,7 @@ public class UserResponse {
     private String goal;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt;
+    private Date createdAt;
 
     // Computed fields
     private Integer age;
@@ -57,17 +57,4 @@ public class UserResponse {
             return "Overweight";
         return "Obese";
     }
-}
-
-// User Summary Response
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-class UserSummaryResponse {
-    private Long id;
-    private String username;
-    private String email;
-    private String fullName;
 }

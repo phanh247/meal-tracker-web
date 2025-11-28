@@ -1,26 +1,18 @@
 package com.example.meal_tracker.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(name = "username", length = 50)
     private String username;
@@ -59,23 +51,15 @@ public class User {
     private String goal;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Date createdAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Meal> meals;
 
-    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch =
-    // FetchType.LAZY)
-    // private List<MealPlan> mealPlans;
-
+    // ========== LIFECYCLE HOOKS ==========
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        calculateBMI();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
+        createdAt = new Date();
         calculateBMI();
     }
 
@@ -84,5 +68,120 @@ public class User {
             double heightInMeters = height / 100.0;
             this.bmi = weight / (heightInMeters * heightInMeters);
         }
+    }
+
+    // ========== GETTERS & SETTERS ==========
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    // Username
+    public String getUsernameField() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public Double getHeight() {
+        return height;
+    }
+
+    public void setHeight(Double height) {
+        this.height = height;
+    }
+
+    public Double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(Double weight) {
+        this.weight = weight;
+    }
+
+    public Double getBmi() {
+        return bmi;
+    }
+
+    public void setBmi(Double bmi) {
+        this.bmi = bmi;
+    }
+
+    public Double getDailyCalories() {
+        return dailyCalories;
+    }
+
+    public void setDailyCalories(Double dailyCalories) {
+        this.dailyCalories = dailyCalories;
+    }
+
+    public String getActivityLevel() {
+        return activityLevel;
+    }
+
+    public void setActivityLevel(String activityLevel) {
+        this.activityLevel = activityLevel;
+    }
+
+    public String getGoal() {
+        return goal;
+    }
+
+    public void setGoal(String goal) {
+        this.goal = goal;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 }

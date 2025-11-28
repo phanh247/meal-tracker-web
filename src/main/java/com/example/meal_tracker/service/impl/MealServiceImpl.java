@@ -113,7 +113,7 @@ public class MealServiceImpl implements MealService {
 
     @Override
     public Page<MealResponse> getMeals(Pageable pageable) {
-        pageable = PageRequest.of(0, 10, Sort.by("id"));
+        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("id"));
         Page<Meal> meals = mealRepository.findAll(pageable);
         return meals.map(DtoConverter::convertToDto);
     }

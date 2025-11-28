@@ -2,8 +2,10 @@ package com.example.meal_tracker.auth;
 
 import com.example.meal_tracker.config.EmailService;
 import com.example.meal_tracker.config.JwtService;
+import com.example.meal_tracker.entity.InvalidatedToken;
 import com.example.meal_tracker.entity.PasswordHistory;
 import com.example.meal_tracker.entity.User;
+import com.example.meal_tracker.repository.InvalidatedTokenRepository;
 import com.example.meal_tracker.repository.PasswordHistoryRepository;
 import com.example.meal_tracker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -28,6 +31,13 @@ public class AuthenticationService {
     //Dịch vụ gửi mail (mail service)
     private final EmailService emailService;
     private final AuthenticationManager authenticationManager;
+    //Đăng xuất
+    private final InvalidatedTokenRepository invalidatedTokenRepository;
+    //formet date để trả timeout token
+    private String formatDate(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        return sdf.format(date);
+    }
 
     // Logic đăng ký
     public AuthenticationResponse register(RegisterRequest request) {
@@ -42,12 +52,18 @@ public class AuthenticationService {
         // Mã hóa mật khẩu trước khi lưu
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         // Lưu user vào DB
-        repository.save(user);
+        User savedUser = repository.save(user);
         // Tạo JWT token
         String jwtToken = jwtService.generateToken(user);
+        //Timeout của token
+        Date expiryDate = jwtService.extractExpiration(jwtToken);
 
         return AuthenticationResponse.builder()
+                .userId(savedUser.getId()) // Lấy ID vừa tạo
                 .token(jwtToken)
+                .expirationTime(formatDate(expiryDate))
+                .status("SUCCESS")
+                .message("Đăng ký tài khoản thành công")
                 .build();
     }
 
@@ -64,13 +80,19 @@ public class AuthenticationService {
 
         // Nếu xác thực thành công, tìm user
         var user = repository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy tài khoản người dùng!"));
 
         // Tạo JWT token
         String jwtToken = jwtService.generateToken(user);
+        //Timeout của token
+        Date expiryDate = jwtService.extractExpiration(jwtToken);
 
         return AuthenticationResponse.builder()
+                .userId(user.getId())
                 .token(jwtToken)
+                .expirationTime(formatDate(expiryDate))
+                .status("SUCCESS")
+                .message("Đăng nhập thành công")
                 .build();
     }
 
@@ -157,5 +179,28 @@ public class AuthenticationService {
         public String changePasswordWithOtp(String email, String otp, String newPassword) {
             return resetPassword(email, newPassword, otp);
         }
+
+    // Logic đăng xuất
+    public void logout(String token) {
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+
+        // Lấy thời gian hết hạn từ token để lưu vào DB
+        Date expiryDate = jwtService.extractExpiration(token);
+
+        // Lưu vào danh sách đen để tránh trường hợp dù đã đăng xuất nhưng vẫn có token để truy cập lại (trong thời gian token còn hiệu lực)
+        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                .id(token)
+                .expiryTime(expiryDate)
+                .build();
+
+        invalidatedTokenRepository.save(invalidatedToken);
+    }
+
+    // Hàm kiểm tra xem token có bị blacklist chưa
+    public boolean isTokenInvalidated(String token) {
+        return invalidatedTokenRepository.existsById(token);
+    }
 
 }

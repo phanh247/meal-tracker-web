@@ -42,4 +42,11 @@ public class AuthenticationController {
     public ResponseEntity<String> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
         return ResponseEntity.ok(service.resetPassword(request.getEmail(), request.getNewPassword(), request.getOtp()));
     }
+
+    //Đăng xất
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
+        service.logout(token);
+        return ResponseEntity.ok("Đăng xuất thành công");
+    }
 }

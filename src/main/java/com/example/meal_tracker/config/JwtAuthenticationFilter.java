@@ -1,5 +1,6 @@
 package com.example.meal_tracker.config;
 
+import com.example.meal_tracker.repository.InvalidatedTokenRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final InvalidatedTokenRepository tokenRepository;
 
     @Override
     protected void doFilterInternal(
@@ -42,6 +44,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Tách lấy token
         jwt = authHeader.substring(7);
+
+        //kiểm tra token có trong blacklist để tránh trường hợp đăng xuất
+        if (tokenRepository.existsById(jwt)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Token has been logged out");
+            return;
+        }
 
         // Lấy email từ token
         userEmail = jwtService.extractUsername(jwt);

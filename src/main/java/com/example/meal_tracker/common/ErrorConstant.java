@@ -21,7 +21,11 @@ public final class ErrorConstant {
 
     public static final String INVALID_MEAL_PLAN_NAME_PARAM = "Meal plan name cannot be null or empty";
 
-    public static final String INVALID_MEAL_PLAN_DATE_PARAM = "Date must be format yyyy-mm-dd";
+    public static final String INVALID_START_DATE_PARAM = "Start date cannot be null or empty";
+
+    public static final String INVALID_END_DATE_PARAM = "End date cannot be null or empty";
+
+    public static final String INVALID_PLAN_TYPE_PARAM = "Plan type cannot be null or empty";
 
     private ErrorConstant() throws IllegalAccessException {
         throw new IllegalAccessException("Cannot instantiate utility class");

@@ -12,6 +12,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -79,5 +82,17 @@ public class IngredientServiceImpl implements IngredientService {
             throw new IngredientManagementException("Ingredient not found");
         }
         ingredientRepository.deleteById(id);
+    }
+
+    @Override
+    public List<IngredientResponse> searchIngredients(String query) {
+        if (query == null || query.isEmpty()) {
+            return ingredientRepository.findAll().stream()
+                    .map(IngredientResponse::fromEntity)
+                    .collect(Collectors.toList());
+        }
+        return ingredientRepository.findByNameContainingIgnoreCase(query).stream()
+                .map(IngredientResponse::fromEntity)
+                .collect(Collectors.toList());
     }
 }

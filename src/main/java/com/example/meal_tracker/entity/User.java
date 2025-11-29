@@ -27,6 +27,10 @@ public class User implements UserDetails {
     @Column(name = "password", length = 255, nullable = false)
     private String password;
 
+    // Các field thuộc chức năng reset password
+    private String resetPasswordToken;
+    private Date tokenExpiryDate;
+
     @Column(name = "full_name", length = 100)
     private String fullName;
 
@@ -100,10 +104,6 @@ public class User implements UserDetails {
     public void setEmail(String email) {
         this.email = email;
     }
-
-    // Các field thuộc chức năng reset password
-    private String resetPasswordToken;
-    private Date tokenExpiryDate;
 
     // UserDetails
     @Override

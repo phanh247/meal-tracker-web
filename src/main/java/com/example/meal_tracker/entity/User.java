@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -25,6 +26,20 @@ public class User implements UserDetails {
     private String resetPasswordToken;
     private Date tokenExpiryDate;
 
+    // Các field bổ sung cho user profile
+    private String gender;
+    private LocalDate birthDate;
+    private Double height; // cm
+    private Double weight; // kg
+    private Double bmi;
+    private Double dailyCalories;
+    private String activityLevel;
+    private String goal;
+
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
     // UserDetails
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -39,30 +54,153 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return email;
-        // Đăng nhập và đăng ký đều email làm thông tin tài khoản chính username cho Spring Security
+        // Đăng nhập và đăng ký đều email làm thông tin tài khoản chính username cho
+        // Spring Security
     }
 
     @Override
-    public boolean isAccountNonExpired() { return true; }
-    @Override
-    public boolean isAccountNonLocked() { return true; }
-    @Override
-    public boolean isCredentialsNonExpired() { return true; }
-    @Override
-    public boolean isEnabled() { return true; }
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
-    public void setUsername(String username) { this.username = username; }
-    public void setEmail(String email) { this.email = email; }
-    public void setPassword(String password) { this.password = password; }
-    public void setFullName(String fullName) { this.fullName = fullName; }
-    public Integer getId() { return id; }
-    public String getEmail() { return email; }
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
 
     // Getter/Setter cho chức năng Reset Password
-    public String getResetPasswordToken() { return resetPasswordToken; }
-    public void setResetPasswordToken(String resetPasswordToken) { this.resetPasswordToken = resetPasswordToken; }
+    public String getResetPasswordToken() {
+        return resetPasswordToken;
+    }
 
-    public Date getTokenExpiryDate() { return tokenExpiryDate; }
-    public void setTokenExpiryDate(Date tokenExpiryDate) { this.tokenExpiryDate = tokenExpiryDate; }
+    public void setResetPasswordToken(String resetPasswordToken) {
+        this.resetPasswordToken = resetPasswordToken;
+    }
+
+    public Date getTokenExpiryDate() {
+        return tokenExpiryDate;
+    }
+
+    public void setTokenExpiryDate(Date tokenExpiryDate) {
+        this.tokenExpiryDate = tokenExpiryDate;
+    }
+
+    // Getter/Setter cho user profile
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public Double getHeight() {
+        return height;
+    }
+
+    public void setHeight(Double height) {
+        this.height = height;
+    }
+
+    public Double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(Double weight) {
+        this.weight = weight;
+    }
+
+    public Double getBmi() {
+        return bmi;
+    }
+
+    public void setBmi(Double bmi) {
+        this.bmi = bmi;
+    }
+
+    public Double getDailyCalories() {
+        return dailyCalories;
+    }
+
+    public void setDailyCalories(Double dailyCalories) {
+        this.dailyCalories = dailyCalories;
+    }
+
+    public String getActivityLevel() {
+        return activityLevel;
+    }
+
+    public void setActivityLevel(String activityLevel) {
+        this.activityLevel = activityLevel;
+    }
+
+    public String getGoal() {
+        return goal;
+    }
+
+    public void setGoal(String goal) {
+        this.goal = goal;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    // PrePersist để tự động set createdAt khi insert
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = new Date();
+        }
+    }
 }

@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.sql.Date;
 
 import com.example.meal_tracker.common.MealType;
-import com.example.meal_tracker.common.PlanType;
 
 @Entity
 @AllArgsConstructor
@@ -37,7 +36,7 @@ public class MealPlanItem implements Serializable {
 
    // nhiều mealPlanItems thuộc 1 mealPlan
    @ManyToOne(fetch = FetchType.EAGER)
-   @JoinColumn(name = "meal_plan_id", nullable = false)
+   @JoinColumn(name = "meal_plan_id", nullable = false, insertable = false, updatable = false)
    private MealPlan mealPlan;
 
    @Column(name = "meal_plan_id", nullable = false)
@@ -45,7 +44,7 @@ public class MealPlanItem implements Serializable {
 
    // nhiều mealPlanItems có thể có cùng 1 meal
    @ManyToOne(fetch = FetchType.EAGER)
-   @JoinColumn(name = "meal_id", nullable = false)
+   @JoinColumn(name = "meal_id", nullable = false, insertable = false, updatable = false)
    private Meal meal;
 
    @Column(name = "meal_id", nullable = false)

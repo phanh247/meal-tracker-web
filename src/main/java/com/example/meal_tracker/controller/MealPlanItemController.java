@@ -1,11 +1,11 @@
 package com.example.meal_tracker.controller;
 
-import com.example.meal_tracker.dto.request.AddMealPlanDayRequest;
-import com.example.meal_tracker.dto.request.UpdateMealPlanDayRequest;
-import com.example.meal_tracker.dto.response.MealPlanDayResponse;
+import com.example.meal_tracker.dto.request.AddMealPlanItemRequest;
+import com.example.meal_tracker.dto.request.UpdateMealPlanItemRequest;
+import com.example.meal_tracker.dto.response.MealPlanItemResponse;
 import com.example.meal_tracker.dto.response.MealPlanResponse;
 import com.example.meal_tracker.exception.InvalidDataException;
-import com.example.meal_tracker.service.MealPlanDayService;
+import com.example.meal_tracker.service.MealPlanItemService;
 import com.example.meal_tracker.util.RequestValidator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,33 +29,33 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/mealplanday")
+@RequestMapping("/api/mealplanitem")
 @RequiredArgsConstructor
 public class MealPlanItemController {
     private static final Logger LOGGER = LoggerFactory.getLogger(MealPlanItemController.class);
 
-    private final MealPlanDayService mealPlanDayService;
+    private final MealPlanItemService mealPlanItemService;
 
     @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> addNewMealPlanDay(@RequestBody @Valid AddMealPlanDayRequest request) {
+    public ResponseEntity<?> addNewMealPlanItem(@RequestBody @Valid AddMealPlanItemRequest request) {
         try {
-            LOGGER.info("Received request to add new meal plan day: {}", request);
+            LOGGER.info("Received request to add new meal plan item: {}", request);
             RequestValidator.validateRequest(request);
-            MealPlanDayResponse response = mealPlanDayService.addNewMealPlanDay(request);
+            MealPlanItemResponse response = mealPlanItemService.addNewMealPlanItem(request);
             return ResponseEntity.ok(response);
         } catch (InvalidDataException | BadRequestException e) {
-            LOGGER.error("Error adding new meal plan day: {}", e.getMessage());
+            LOGGER.error("Error adding new meal plan item: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     @PutMapping(value = "/update/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateMealPlanDay(@PathVariable("id") Long id,
-            @RequestBody @Valid UpdateMealPlanDayRequest updateMealPlanDayRequest) {
+    public ResponseEntity<?> updateMealPlanItem(@PathVariable("id") Long id,
+            @RequestBody @Valid UpdateMealPlanItemRequest updateMealPlanItemRequest) {
         try {
-            LOGGER.info("Received request to update meal plan day with id: {}", id);
-            RequestValidator.validateRequest(updateMealPlanDayRequest);
-            mealPlanDayService.updateMealPlanDay(id, updateMealPlanDayRequest);
+            LOGGER.info("Received request to update meal plan item with id: {}", id);
+            RequestValidator.validateRequest(updateMealPlanItemRequest);
+            mealPlanItemService.updateMealPlanItem(id, updateMealPlanItemRequest);
             return ResponseEntity.ok(true);
         } catch (InvalidDataException | BadRequestException e) {
             LOGGER.error("Error updating meal plan: {}", e.getMessage());
@@ -66,19 +66,19 @@ public class MealPlanItemController {
     @DeleteMapping(value = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> deleteMeal(@PathVariable("id") Long id) {
         try {
-            LOGGER.info("Received request to delete meal plan day with id: {}", id);
-            mealPlanDayService.deleteMealPlanDay(id);
+            LOGGER.info("Received request to delete meal plan item with id: {}", id);
+            mealPlanItemService.deleteMealPlanItem(id);
             return ResponseEntity.ok(true);
         } catch (BadRequestException e) {
-            LOGGER.error("Error deleting meal plan day: {}", e.getMessage());
+            LOGGER.error("Error deleting meal plan item: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<MealPlanDayResponse>> getMealPlanDays(Pageable pageable,
+    public ResponseEntity<Page<MealPlanItemResponse>> getMealPlanItems(Pageable pageable,
             Long mealPlanId) {
-        LOGGER.info("Received request to get all meal plan day {} {}", pageable.toString(), mealPlanId);
-        return ResponseEntity.ok(mealPlanDayService.getMealPlanDays(pageable, mealPlanId));
+        LOGGER.info("Received request to get all meal plan item {} {}", pageable.toString(), mealPlanId);
+        return ResponseEntity.ok(mealPlanItemService.getMealPlanItems(pageable, mealPlanId));
     }
 }

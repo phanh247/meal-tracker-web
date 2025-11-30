@@ -5,15 +5,16 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.sql.Date;
+import java.time.LocalDate;
+
+import com.example.meal_tracker.common.MealType;
 
 @Data
 @Builder
-public class AddMealPlanDayRequest implements Serializable {
+public class UpdateMealPlanItemRequest implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public Long mealPlanId;
-    public String date;
-
+    public MealType mealType;
+    public LocalDate mealDate;
 }

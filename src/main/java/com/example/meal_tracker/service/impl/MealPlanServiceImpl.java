@@ -70,10 +70,10 @@ public class MealPlanServiceImpl implements MealPlanService {
         mealPlanRepository.deleteById(mealPlanId);
     }
 
-    @Override
-    public Page<MealPlanResponse> getMealPlans(Pageable pageable, Long userId) {
-        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
-        Page<MealPlan> mealPlans = mealPlanRepository.findByUserId(pageable, userId);
-        return mealPlans.map(DtoConverter::convertToDto);
-    }
+//    @Override
+//    public Page<MealPlanResponse> getMealPlans(Pageable pageable, Long userId) {
+//        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+//        Page<MealPlan> mealPlans = mealPlanRepository.findByUserId(pageable, userId);
+//        return mealPlans.map(DtoConverter::convertToDto);
+//    }
 }

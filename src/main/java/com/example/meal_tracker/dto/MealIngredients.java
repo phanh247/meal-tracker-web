@@ -11,9 +11,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class MealIngredients {
+    @JsonProperty("ingredient_id")
+    private Long ingredientId;
+
     @JsonProperty("ingredient_name")
     private String ingredientName;
 
     @JsonProperty("quantity")
     private float quantity;
+
+    @JsonProperty("unit")
+    private String unit;
 }

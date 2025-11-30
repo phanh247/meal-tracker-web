@@ -2,6 +2,7 @@ package com.example.meal_tracker.controller;
 
 import com.example.meal_tracker.dto.request.AddMealRequest;
 import com.example.meal_tracker.dto.response.MealResponse;
+import com.example.meal_tracker.entity.Meal;
 import com.example.meal_tracker.exception.InvalidDataException;
 import com.example.meal_tracker.exception.NotFoundException;
 import com.example.meal_tracker.service.MealService;
@@ -74,13 +75,13 @@ public class MealController {
 
     @PutMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateMeal(@PathVariable("id") Long id,
-                                        @RequestPart("data") AddMealRequest request,
-                                        @RequestPart(value = "image", required = false) MultipartFile imageFile) {
+                                           @RequestPart("data") AddMealRequest request,
+                                           @RequestPart(value = "image", required = false) MultipartFile imageFile) {
         try {
             LOGGER.info("Received request to update meal with id: {}", id);
             RequestValidator.validateRequest(request);
-            mealService.updateMeal(id, request, imageFile);
-            return ResponseEntity.ok(true);
+            MealResponse response = mealService.updateMeal(id, request, imageFile);
+            return ResponseEntity.ok(response);
         } catch (InvalidDataException | NotFoundException | IOException e) {
             LOGGER.error("Error updating meal: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

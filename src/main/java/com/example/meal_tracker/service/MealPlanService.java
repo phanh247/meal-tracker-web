@@ -8,9 +8,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface MealPlanService {
-    MealPlanResponse addNewMealPlan(AddMealPlanRequest addMealPlanRequest) throws BadRequestException;
+//    MealPlanResponse addNewMealPlan(AddMealPlanRequest addMealPlanRequest) throws BadRequestException;
 
-    Page<MealPlanResponse> getMealPlans(Pageable pageable, Long userId);
+//    Page<MealPlanResponse> getMealPlans(Pageable pageable, Long userId);
 
     void updateMealPlan(Long mealPlanId, UpdateMealPlanRequest updateMealPlanRequest) throws BadRequestException;
 

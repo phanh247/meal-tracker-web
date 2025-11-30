@@ -35,25 +35,25 @@ public class MealPlanController {
 
     private final MealPlanService mealPlanService;
 
-    @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> addNewMealPlan(@RequestBody @Valid AddMealPlanRequest request) {
-        try {
-            LOGGER.info("Received request to add new meal plan: {}", request);
-            RequestValidator.validateRequest(request);
-            MealPlanResponse response = mealPlanService.addNewMealPlan(request);
-            return ResponseEntity.ok(response);
-        } catch (InvalidDataException | BadRequestException e) {
-            LOGGER.error("Error adding new meal plan: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
+//    @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<?> addNewMealPlan(@RequestBody @Valid AddMealPlanRequest request) {
+//        try {
+//            LOGGER.info("Received request to add new meal plan: {}", request);
+//            RequestValidator.validateRequest(request);
+//            MealPlanResponse response = mealPlanService.addNewMealPlan(request);
+//            return ResponseEntity.ok(response);
+//        } catch (InvalidDataException | BadRequestException e) {
+//            LOGGER.error("Error adding new meal plan: {}", e.getMessage());
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+//        }
+//    }
 
-    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<MealPlanResponse>> getMealPlans(Pageable pageable,
-            Long userId) {
-        LOGGER.info("Received request to get all meal plans {} {}", pageable.toString(), userId);
-        return ResponseEntity.ok(mealPlanService.getMealPlans(pageable, userId));
-    }
+//    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<Page<MealPlanResponse>> getMealPlans(Pageable pageable,
+//            Long userId) {
+//        LOGGER.info("Received request to get all meal plans {} {}", pageable.toString(), userId);
+//        return ResponseEntity.ok(mealPlanService.getMealPlans(pageable, userId));
+//    }
 
     @PutMapping(value = "/update/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateMealPlan(@PathVariable("id") Long id,

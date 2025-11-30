@@ -31,26 +31,22 @@ public class MealPlanServiceImpl implements MealPlanService {
 
     private final MealPlanRepository mealPlanRepository;
 
-    @SuppressWarnings("null")
-    public MealPlanResponse addNewMealPlan(AddMealPlanRequest addMealPlanRequest) throws BadRequestException {
-        // Check if mealPlanName is null or empty
-        if (addMealPlanRequest.mealPlanName == null || addMealPlanRequest.mealPlanName == "") {
-            LOGGER.info("Meal plan with name '{}' is empty.", addMealPlanRequest.mealPlanName);
-            throw new BadRequestException(String.format(ErrorConstant.INVALID_MEAL_PLAN_NAME_PARAM));
-        }
-
-        // Find if mealPlanName already exists
-        Optional<MealPlan> existingMealPlan = mealPlanRepository.findByName(addMealPlanRequest.mealPlanName);
-        if (existingMealPlan.isPresent()) {
-            LOGGER.info("Meal plan with name '{}' already exists.", addMealPlanRequest.mealPlanName);
-            throw new BadRequestException(
-                    String.format(ErrorConstant.MEAL_PLAN_EXISTED, addMealPlanRequest.mealPlanName));
-        }
-
-        MealPlan newMealPlanEntity = DtoConverter.convertToEntity(addMealPlanRequest);
-        mealPlanRepository.save(newMealPlanEntity);
-        return DtoConverter.convertToDto(newMealPlanEntity);
-    }
+//    @SuppressWarnings("null")
+//    public MealPlanResponse addNewMealPlan(AddMealPlanRequest addMealPlanRequest) throws BadRequestException {
+//        // Check if mealPlanName is null or empty
+//        if (addMealPlanRequest.mealPlanName == null || addMealPlanRequest.mealPlanName == "") {
+//            LOGGER.info("Meal plan with name '{}' is empty.", addMealPlanRequest.mealPlanName);
+//            throw new BadRequestException(String.format(ErrorConstant.INVALID_MEAL_PLAN_NAME_PARAM));
+//        }
+//
+//        // Find if mealPlanName already exists
+//        Optional<MealPlan> existingMealPlan = mealPlanRepository.findByName(addMealPlanRequest.mealPlanName);
+//        if (existingMealPlan.isPresent()) {
+//            LOGGER.info("Meal plan with name '{}' already exists.", addMealPlanRequest.mealPlanName);
+//            throw new BadRequestException(
+//                    String.format(ErrorConstant.MEAL_PLAN_EXISTED, addMealPlanRequest.mealPlanName));
+//        }
+//    }
 
     @SuppressWarnings("null")
     @Override
@@ -80,10 +76,10 @@ public class MealPlanServiceImpl implements MealPlanService {
         mealPlanRepository.deleteById(mealPlanId);
     }
 
-    @Override
-    public Page<MealPlanResponse> getMealPlans(Pageable pageable, Long userId) {
-        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
-        Page<MealPlan> mealPlans = mealPlanRepository.findByUserId(pageable, userId);
-        return mealPlans.map(DtoConverter::convertToDto);
-    }
+//    @Override
+//    public Page<MealPlanResponse> getMealPlans(Pageable pageable, Long userId) {
+//        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+//        Page<MealPlan> mealPlans = mealPlanRepository.findByUserId(pageable, userId);
+//        return mealPlans.map(DtoConverter::convertToDto);
+//    }
 }

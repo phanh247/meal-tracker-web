@@ -1,7 +1,7 @@
 package com.example.meal_tracker.common;
 
 public enum MealType {
-    MORNING,
+    BREAKFAST,
     LUNCH,
     SNACK,
     DINNER,

@@ -4,7 +4,11 @@ import com.example.meal_tracker.common.ErrorConstant;
 import com.example.meal_tracker.dto.request.AddMealPlanRequest;
 import com.example.meal_tracker.dto.request.UpdateMealPlanRequest;
 import com.example.meal_tracker.dto.response.MealPlanResponse;
+import com.example.meal_tracker.dto.response.MealResponse;
+import com.example.meal_tracker.entity.Meal;
 import com.example.meal_tracker.entity.MealPlan;
+import com.example.meal_tracker.exception.NotFoundException;
+import com.example.meal_tracker.repository.MealPlanItemRepository;
 import com.example.meal_tracker.repository.MealPlanRepository;
 import com.example.meal_tracker.service.MealPlanService;
 import com.example.meal_tracker.util.converter.DtoConverter;
@@ -19,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import static com.example.meal_tracker.common.ErrorConstant.MEAL_PLAN_ALREADY_HAD_MEAL_PLAN_ITEM;
 import static com.example.meal_tracker.common.ErrorConstant.MEAL_PLAN_NOT_FOUND;
 
 import java.sql.Date;
@@ -28,9 +33,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional
 public class MealPlanServiceImpl implements MealPlanService {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MealPlanServiceImpl.class);
 
     private final MealPlanRepository mealPlanRepository;
+    private final MealPlanItemRepository mealPlanItemRepository;
 
     public MealPlanResponse addNewMealPlan(AddMealPlanRequest addMealPlanRequest) throws BadRequestException {
         MealPlan newMealPlanEntity = DtoConverter.convertToEntity(addMealPlanRequest);
@@ -67,6 +74,9 @@ public class MealPlanServiceImpl implements MealPlanService {
             LOGGER.info(MEAL_PLAN_NOT_FOUND, mealPlanId);
             throw new BadRequestException(String.format(MEAL_PLAN_NOT_FOUND, mealPlanId));
         }
+        if (mealPlanItemRepository.existsByMealPlanId(mealPlanId))
+            throw new BadRequestException(String.format(MEAL_PLAN_ALREADY_HAD_MEAL_PLAN_ITEM, mealPlanId));
+
         mealPlanRepository.deleteById(mealPlanId);
     }
 
@@ -75,5 +85,14 @@ public class MealPlanServiceImpl implements MealPlanService {
         pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
         Page<MealPlan> mealPlans = mealPlanRepository.findByUserId(pageable, userId);
         return mealPlans.map(DtoConverter::convertToDto);
+    }
+
+    @Override
+    public MealPlanResponse getMealPlanById(Long id) throws NotFoundException {
+        Optional<MealPlan> mealPlan = mealPlanRepository.findById(id);
+        if (mealPlan.isEmpty())
+            throw new NotFoundException(String.format(MEAL_PLAN_NOT_FOUND, id));
+
+        return DtoConverter.convertToDto(mealPlan.get());
     }
 }

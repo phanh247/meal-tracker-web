@@ -10,6 +10,8 @@ import com.example.meal_tracker.util.RequestValidator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
+
 import org.apache.coyote.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,8 +79,8 @@ public class MealPlanItemController {
 
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<MealPlanItemResponse>> getMealPlanItems(Pageable pageable,
-            Long mealPlanId) {
-        LOGGER.info("Received request to get all meal plan item {} {}", pageable.toString(), mealPlanId);
-        return ResponseEntity.ok(mealPlanItemService.getMealPlanItems(pageable, mealPlanId));
+            Long mealPlanId, LocalDate date) {
+        LOGGER.info("Received request to get all meal plan item {} {}", pageable.toString(), mealPlanId, date);
+        return ResponseEntity.ok(mealPlanItemService.getMealPlanItems(pageable, mealPlanId, date));
     }
 }

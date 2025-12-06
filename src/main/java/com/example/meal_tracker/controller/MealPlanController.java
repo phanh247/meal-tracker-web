@@ -4,6 +4,7 @@ import com.example.meal_tracker.dto.request.AddMealPlanRequest;
 import com.example.meal_tracker.dto.request.UpdateMealPlanRequest;
 import com.example.meal_tracker.dto.response.MealPlanResponse;
 import com.example.meal_tracker.exception.InvalidDataException;
+import com.example.meal_tracker.exception.NotFoundException;
 import com.example.meal_tracker.service.MealPlanService;
 import com.example.meal_tracker.util.RequestValidator;
 import jakarta.validation.Valid;
@@ -53,6 +54,12 @@ public class MealPlanController {
             Long userId) {
         LOGGER.info("Received request to get all meal plans {} {}", pageable.toString(), userId);
         return ResponseEntity.ok(mealPlanService.getMealPlans(pageable, userId));
+    }
+
+    @GetMapping(value = "/detail/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MealPlanResponse> getMealPlan(
+            @PathVariable("id") Long id) throws NotFoundException {
+        return ResponseEntity.ok(mealPlanService.getMealPlanById(id));
     }
 
     @PutMapping(value = "/update/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

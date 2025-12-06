@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import static com.example.meal_tracker.common.ErrorConstant.MEAL_PLAN_ITEM_NOT_FOUND;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -101,8 +102,13 @@ public class MealPlanItemServiceImpl implements MealPlanItemService {
     }
 
     @Override
-    public Page<MealPlanItemResponse> getMealPlanItems(Pageable pageable, Long mealPlanId) {
+    public Page<MealPlanItemResponse> getMealPlanItems(Pageable pageable, Long mealPlanId, LocalDate date) {
         pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+        if (date != null) {
+            Page<MealPlanItem> mealPlanItems = mealPlanItemRepository.findByMealPlanIdAndDate(mealPlanId,
+                    Date.valueOf(date));
+            return mealPlanItems.map(DtoConverter::convertToDto);
+        }
         Page<MealPlanItem> mealPlanItems = mealPlanItemRepository.findByMealPlanId(pageable, mealPlanId);
         return mealPlanItems.map(DtoConverter::convertToDto);
     }

@@ -17,9 +17,9 @@ public class RequestValidator {
         if (request == null) {
             throw new InvalidDataException(ErrorConstant.INVALID_REQUEST_DATA);
         }
-        if (request.getMealName() == null || request.getMealName().isEmpty()) {
-            throw new InvalidDataException(ErrorConstant.INVALID_MEAL_NAME_PARAM);
-        }
+//        if (request.getMealName() == null || request.getMealName().isEmpty()) {
+//            throw new InvalidDataException(ErrorConstant.INVALID_MEAL_NAME_PARAM);
+//        }
     }
 
     public static void validateRequest(AddCategoryRequest request) throws InvalidDataException {

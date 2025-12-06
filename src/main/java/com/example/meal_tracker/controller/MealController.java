@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -40,7 +41,7 @@ public class MealController {
     private final MealService mealService;
 
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> addNewMeal(@RequestPart("data") AddMealRequest request,
+    public ResponseEntity<?> addNewMeal(@ModelAttribute AddMealRequest request,
                                         @RequestPart("image") MultipartFile imageFile) {
         try {
             LOGGER.info("Received request to add new meal: {}", request);
@@ -75,12 +76,11 @@ public class MealController {
 
     @PutMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateMeal(@PathVariable("id") Long id,
-                                           @RequestPart("data") AddMealRequest request,
-                                           @RequestPart(value = "image", required = false) MultipartFile imageFile) {
+                                        @ModelAttribute AddMealRequest request) {
         try {
-            LOGGER.info("Received request to update meal with id: {}", id);
+            LOGGER.info("Received request to update meal with info: {}", request);
             RequestValidator.validateRequest(request);
-            MealResponse response = mealService.updateMeal(id, request, imageFile);
+            MealResponse response = mealService.updateMeal(id, request);
             return ResponseEntity.ok(response);
         } catch (InvalidDataException | NotFoundException | IOException e) {
             LOGGER.error("Error updating meal: {}", e.getMessage());

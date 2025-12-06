@@ -127,8 +127,10 @@ public class MealServiceImpl implements MealService {
     }
 
     @Override
-    public MealResponse updateMeal(Long id, AddMealRequest request, MultipartFile imageFile)
+    public MealResponse updateMeal(Long id, AddMealRequest request)
     throws NotFoundException, IOException, InvalidDataException {
+
+        MultipartFile imageFile = request.getImage();
 
         // 1. Check meal existed
         Meal meal = mealRepository.findById(id)
@@ -178,7 +180,7 @@ public class MealServiceImpl implements MealService {
         meal.setCalories(totalCalories);
 
         // 7. Save meal
-        LOGGER.info("Updating meal with id: {}", id);
+        LOGGER.info("Updating meal={}", meal);
         Meal updated = mealRepository.save(meal);
 
         return DtoConverter.convertToDto(updated);

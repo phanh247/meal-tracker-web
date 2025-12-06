@@ -15,7 +15,7 @@ public interface MealService {
     MealResponse addNewMeal(AddMealRequest request, MultipartFile imageFile) throws NotFoundException, IOException;
     Page<MealResponse> getMeals(Pageable pageable);
     MealResponse getMealById(Long id) throws NotFoundException;
-    MealResponse updateMeal(Long id, AddMealRequest request, MultipartFile imageFile)
+    MealResponse updateMeal(Long id, AddMealRequest request)
     throws NotFoundException, IOException, InvalidDataException;
     void deleteMeal(Long id) throws NotFoundException;
     Page<MealResponse> filterMeals(String categoryName, String mealName, Double minCalories, Double maxCalories,

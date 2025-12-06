@@ -2,9 +2,11 @@ package com.example.meal_tracker.dto.request;
 
 import com.example.meal_tracker.dto.MealIngredients;
 import com.example.meal_tracker.dto.MealInstruction;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -12,33 +14,21 @@ import java.util.List;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AddMealRequest implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @JsonProperty("meal_name")
     private String mealName;
-
-    @JsonProperty("meal_description")
     private String mealDescription;
-
-    @JsonProperty("meal_ingredients")
     private List<MealIngredients> mealIngredients;
-
-    @JsonProperty("meal_instruction")
     private List<MealInstruction> mealInstructions;
-
-    @JsonProperty("cooking_time")
     private String cookingTime;
-
-    @JsonProperty("servings")
     private int servings;
-
-    @JsonProperty("nutrition")
     private List<String> nutrition;
-
-    @JsonProperty("category_name")
     private List<String> categoryName;
+    private MultipartFile image;
 
     @Override
     public String toString() {
@@ -51,6 +41,7 @@ public class AddMealRequest implements Serializable {
                 ", cookingTime='" + cookingTime + '\'' +
                 ", servings=" + servings +
                 ", nutrition=" + nutrition +
+                ", image=" + image +
                 '}';
     }
 }

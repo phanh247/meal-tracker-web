@@ -51,7 +51,7 @@ public class MealServiceImpl implements MealService {
 
     @Override
     public MealResponse addNewMeal(AddMealRequest request, MultipartFile imageFile)
-    throws NotFoundException, IOException {
+            throws NotFoundException, IOException {
 
         // Check whether categories existed or not
         Set<Category> mealCategories = new HashSet<>();
@@ -125,7 +125,8 @@ public class MealServiceImpl implements MealService {
     }
 
     @Override
-    public void updateMeal(Long id, AddMealRequest request, MultipartFile imageFile) throws NotFoundException, IOException {
+    public void updateMeal(Long id, AddMealRequest request, MultipartFile imageFile)
+            throws NotFoundException, IOException {
         // Check meal existed
         Optional<Meal> meal = checkMealExists(id);
         Meal existingMeal = meal.get();
@@ -133,7 +134,7 @@ public class MealServiceImpl implements MealService {
         existingMeal.setName(request.getMealName());
         existingMeal.setDescription(request.getMealDescription());
         existingMeal.setMealInstructions(request.getMealInstructions());
-//        existingMeal.setCalories(request.getCalories());
+        // existingMeal.setCalories(request.getCalories());
         existingMeal.setDescription(request.getMealDescription());
 
         if (imageFile != null && !imageFile.isEmpty()) {
@@ -154,7 +155,7 @@ public class MealServiceImpl implements MealService {
 
     @Override
     public Page<MealResponse> filterMeals(String categoryName, String mealName, Double minCalories, Double maxCalories,
-                                          String ingredientName, Pageable pageable) {
+            String ingredientName, Pageable pageable) {
         Specification<Meal> spec = Specification
                 .where(MealSpecification.hasName(mealName))
                 .or(MealSpecification.hasCategoryName(categoryName))
@@ -162,7 +163,6 @@ public class MealServiceImpl implements MealService {
                 .or(MealSpecification.caloriesBetween(minCalories, maxCalories));
 
         Page<Meal> result = mealRepository.findAll(spec, pageable);
-
         // Convert each Meal to MealResponse
         return result.map(DtoConverter::convertToDto);
     }

@@ -15,8 +15,15 @@ import org.springframework.stereotype.Repository;
 public interface MealPlanItemRepository extends JpaRepository<MealPlanItem, Long> {
     Page<MealPlanItem> findByMealPlanId(Pageable pageable, Long mealPlanId);
 
-    @Query("SELECT mp FROM MealPlan mp  WHERE mp.id = :id AND mp.start_date >= :date AND mp.end_date <= :date");
-    Page<MealPlanItem> findByMealPlanIdAndDate(@Param("id") Long id, @Param("date") Date date);
+    @Query("""
+            SELECT mpi FROM MealPlanItem mpi
+            WHERE mpi.mealPlan.id = :id
+            AND :date BETWEEN mpi.mealPlan.startDate AND mpi.mealPlan.endDate
+            """)
+    Page<MealPlanItem> findByMealPlanIdAndDate(
+            @Param("id") Long id,
+            @Param("date") Date date,
+            Pageable pageable);
 
     Boolean existsByMealPlanId(Long mealPlanId);
 

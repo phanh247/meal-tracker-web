@@ -31,6 +31,11 @@ public class User implements UserDetails {
     private LocalDate birthDate;
     private Double height; // cm
     private Double weight; // kg
+
+    // Target weight (cân nặng mục tiêu)
+    @Column(name = "weight_goal")
+    private Double weightGoal; // kg
+
     private Double bmi;
     private Double dailyCalories;
     private String activityLevel;
@@ -43,7 +48,7 @@ public class User implements UserDetails {
     // UserDetails
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(); // Do không phân chia role nên không cấu hinh
+        return List.of();
     }
 
     @Override
@@ -54,8 +59,6 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return email;
-        // Đăng nhập và đăng ký đều email làm thông tin tài khoản chính username cho
-        // Spring Security
     }
 
     @Override
@@ -77,6 +80,8 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    // Getters and Setters
 
     public void setUsername(String username) {
         this.username = username;
@@ -150,6 +155,42 @@ public class User implements UserDetails {
 
     public void setWeight(Double weight) {
         this.weight = weight;
+    }
+
+    public Double getWeightGoal() {
+        return weightGoal;
+    }
+
+    public void setWeightGoal(Double weightGoal) {
+        this.weightGoal = weightGoal;
+    }
+
+    /**
+     * Tính chênh lệch giữa cân nặng hiện tại và mục tiêu
+     * 
+     * @return Số kg cần tăng/giảm (positive = cần giảm, negative = cần tăng)
+     */
+    public Double getWeightDifference() {
+        if (weight != null && weightGoal != null) {
+            return weight - weightGoal;
+        }
+        return null;
+    }
+
+    /**
+     * Kiểm tra xem đã đạt mục tiêu cân nặng chưa
+     * 
+     * @param tolerance Độ sai lệch cho phép (kg), mặc định 0.5kg
+     * @return true nếu đã đạt mục tiêu (trong khoảng tolerance)
+     */
+    public boolean isWeightGoalAchieved(Double tolerance) {
+        if (weight == null || weightGoal == null) {
+            return false;
+        }
+        if (tolerance == null) {
+            tolerance = 0.5; // Mặc định chênh lệch 0.5kg là đạt mục tiêu
+        }
+        return Math.abs(weight - weightGoal) <= tolerance;
     }
 
     public Double getBmi() {

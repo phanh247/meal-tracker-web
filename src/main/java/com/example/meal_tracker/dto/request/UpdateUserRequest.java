@@ -33,9 +33,15 @@ public class UpdateUserRequest implements Serializable {
     @JsonProperty("weight")
     private Double weight;
 
+    @JsonProperty("weight_goal")
+    private Double weightGoal;
+
     @JsonProperty("activity_level")
     private String activityLevel;
 
     @JsonProperty("goal")
     private String goal;
+
+    @JsonProperty("daily_calories")
+    private Double dailyCalories;
 }

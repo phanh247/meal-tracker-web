@@ -7,9 +7,11 @@ import com.example.meal_tracker.entity.Category;
 import com.example.meal_tracker.entity.Ingredient;
 import com.example.meal_tracker.entity.Meal;
 import com.example.meal_tracker.entity.MealIngredient;
+import com.example.meal_tracker.exception.InvalidDataException;
 import com.example.meal_tracker.exception.NotFoundException;
 import com.example.meal_tracker.repository.CategoryRepository;
 import com.example.meal_tracker.repository.IngredientRepository;
+import com.example.meal_tracker.repository.MealIngredientRepository;
 import com.example.meal_tracker.repository.MealRepository;
 import com.example.meal_tracker.service.ImageUploadService;
 import com.example.meal_tracker.service.MealService;
@@ -31,7 +33,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static com.example.meal_tracker.common.ErrorConstant.CATEGORY_NOT_FOUND;
@@ -47,6 +48,7 @@ public class MealServiceImpl implements MealService {
     private final MealRepository mealRepository;
     private final CategoryRepository categoryRepository;
     private final IngredientRepository ingredientRepository;
+    private final MealIngredientRepository mealIngredientRepository;
     private final ImageUploadService imageUploadService;
 
     @Override
@@ -65,21 +67,19 @@ public class MealServiceImpl implements MealService {
         float totalCalories = 0;
         List<MealIngredient> mealIngredients = new ArrayList<>();
         for (MealIngredients mi : request.getMealIngredients()) {
-            Optional<Ingredient> ingredient = ingredientRepository.findByName(mi.getIngredientName());
-            if (ingredient.isEmpty()) {
-                LOGGER.info("Ingredient with name '{}' does not exist.", mi.getIngredientName());
-                throw new NotFoundException(String.format(INGREDIENT_NOT_FOUND, mi.getIngredientName()));
-            }
+            Ingredient ingredient = ingredientRepository.findById(mi.getIngredientId())
+                    .orElseThrow(() -> new NotFoundException(String.format(INGREDIENT_NOT_FOUND,
+                            mi.getIngredientId())));
 
             // Create join record
             MealIngredient mealIngredient = MealIngredient.builder()
-                    .ingredient(ingredient.get())
+                    .ingredient(ingredient)
                     .quantity(mi.getQuantity())
                     .build();
             mealIngredients.add(mealIngredient);
 
             // Calculate calories
-            float ingredientCalories = ingredient.get().getCalories();
+            float ingredientCalories = ingredient.getCalories();
             totalCalories += (ingredientCalories * mi.getQuantity());
         }
 
@@ -120,37 +120,78 @@ public class MealServiceImpl implements MealService {
 
     @Override
     public MealResponse getMealById(Long id) throws NotFoundException {
-        Optional<Meal> meal = checkMealExists(id);
-        return DtoConverter.convertToDto(meal.get());
+        Meal meal = mealRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format(MEAL_NOT_FOUND, id)));
+
+        return DtoConverter.convertToDto(meal);
     }
 
     @Override
-    public void updateMeal(Long id, AddMealRequest request, MultipartFile imageFile)
-            throws NotFoundException, IOException {
-        // Check meal existed
-        Optional<Meal> meal = checkMealExists(id);
-        Meal existingMeal = meal.get();
+    public MealResponse updateMeal(Long id, AddMealRequest request)
+            throws NotFoundException, IOException, InvalidDataException {
 
-        existingMeal.setName(request.getMealName());
-        existingMeal.setDescription(request.getMealDescription());
-        existingMeal.setMealInstructions(request.getMealInstructions());
-        // existingMeal.setCalories(request.getCalories());
-        existingMeal.setDescription(request.getMealDescription());
+        MultipartFile imageFile = request.getImage();
 
+        // 1. Check meal existed
+        Meal meal = mealRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format(MEAL_NOT_FOUND, id)));
+
+        // 2. Update meal fields
+        meal.setName(request.getMealName());
+        meal.setServings(request.getServings());
+        meal.setCookingTime(request.getCookingTime());
+        meal.setMealInstructions(request.getMealInstructions());
+
+        // 3. Update image if new file uploaded
         if (imageFile != null && !imageFile.isEmpty()) {
-            String uploadedUrl = imageUploadService.upload(imageFile, imageFile.getOriginalFilename());
-            existingMeal.setImageUrl(uploadedUrl); // overwrite old image
+            String imageUrl = imageUploadService.upload(imageFile, imageFile.getOriginalFilename());
+            meal.setImageUrl(imageUrl);
         }
 
-        LOGGER.info("Updating meal with id: {}", id);
-        mealRepository.save(existingMeal);
+        // 4. Remove old ingredient mappings
+        mealIngredientRepository.deleteByMealId(id);
+
+        float totalCalories = 0;
+
+        // 5. Insert new ingredient mappings + recalc calories
+        if (request.getMealIngredients() != null) {
+            for (MealIngredients item : request.getMealIngredients()) {
+                if (item.getIngredientId() == null) { // ✅ Prevent null ID
+                    throw new InvalidDataException("Ingredient ID must not be null in meal ingredients!");
+                }
+
+                Ingredient ingredient = ingredientRepository.findById(item.getIngredientId())
+                        .orElseThrow(() -> new NotFoundException(
+                                String.format(INGREDIENT_NOT_FOUND, item.getIngredientId())));
+
+                // Create and save mapping
+                MealIngredient mi = new MealIngredient();
+                mi.setMeal(meal);
+                mi.setIngredient(ingredient);
+                mi.setQuantity(item.getQuantity());
+                mealIngredientRepository.save(mi);
+
+                // Recalculate calories correctly
+                totalCalories += item.getQuantity() * ingredient.getCalories();
+            }
+        }
+
+        // 6. Update meal calories
+        meal.setCalories(totalCalories);
+
+        // 7. Save meal
+        LOGGER.info("Updating meal={}", meal);
+        Meal updated = mealRepository.save(meal);
+
+        return DtoConverter.convertToDto(updated);
     }
 
     @Override
     public void deleteMeal(Long id) throws NotFoundException {
-        Optional<Meal> meal = checkMealExists(id);
+        Meal meal = mealRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format(MEAL_NOT_FOUND, id)));
         LOGGER.info("Deleting meal with id: {}", id);
-        mealRepository.delete(meal.get());
+        mealRepository.delete(meal);
     }
 
     @Override
@@ -186,14 +227,5 @@ public class MealServiceImpl implements MealService {
         return similarMeals.stream()
                 .map(DtoConverter::convertToDto)
                 .toList();
-    }
-
-    private Optional<Meal> checkMealExists(Long id) throws NotFoundException {
-        Optional<Meal> meal = mealRepository.findById(id);
-        if (meal.isEmpty()) {
-            LOGGER.info(MEAL_NOT_FOUND, id);
-            throw new NotFoundException(String.format(MEAL_NOT_FOUND, id));
-        }
-        return meal;
     }
 }

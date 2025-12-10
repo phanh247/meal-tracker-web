@@ -36,11 +36,24 @@ public class UserResponse implements Serializable {
     @JsonProperty("birth_date")
     private LocalDate birthDate;
 
+    @JsonProperty("age")
+    private Integer age;
+
     @JsonProperty("height")
     private Double height;
 
     @JsonProperty("weight")
     private Double weight;
+
+    @JsonProperty("weight_goal")
+    private Double weightGoal;
+
+    // Chênh lệch cân nặng
+    @JsonProperty("weight_difference")
+    private Double weightDifference; // positive = cần giảm, negative = cần tăng
+
+    @JsonProperty("goal_achieved")
+    private Boolean goalAchieved;
 
     @JsonProperty("bmi")
     private Double bmi;

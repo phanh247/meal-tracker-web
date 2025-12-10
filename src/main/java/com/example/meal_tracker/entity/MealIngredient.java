@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -24,10 +25,12 @@ public class MealIngredient {
 
     @ManyToOne
     @JoinColumn(name = "meal_id", nullable = false)
+    @ToString.Exclude
     private Meal meal;
 
     @ManyToOne
     @JoinColumn(name = "ingredient_id", nullable = false)
+    @ToString.Exclude
     private Ingredient ingredient;
 
     // ví dụ: grams, pieces, ml, tablespoon...

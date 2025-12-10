@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.Type;
 
 import java.io.Serializable;
@@ -82,6 +83,7 @@ public class Meal implements Serializable {
             joinColumns = @JoinColumn(name = "meal_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
+    @ToString.Exclude
     private Set<Category> categories;
 
 //    @ManyToOne(fetch = FetchType.EAGER)
@@ -89,6 +91,7 @@ public class Meal implements Serializable {
 //    private Author author;
 
     @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private List<MealIngredient> mealIngredients = new ArrayList<>();
 
 }

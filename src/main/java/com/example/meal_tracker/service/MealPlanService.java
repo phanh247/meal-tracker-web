@@ -12,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 public interface MealPlanService {
     MealPlanResponse addNewMealPlan(AddMealPlanRequest addMealPlanRequest) throws BadRequestException;
 
-    Page<MealPlanResponse> getMealPlans(Pageable pageable, Long userId);
+//    Page<MealPlanResponse> getMealPlans(Pageable pageable, Long userId);
 
     MealPlanResponse getMealPlanById(Long id) throws NotFoundException;
 

@@ -35,13 +35,7 @@ public final class DtoConverter {
                 .map(Category::getName)
                 .collect(Collectors.toList());
 
-        List<MealIngredients> mealIngredients = new ArrayList<>();
-        for (MealIngredient mi : meal.getMealIngredients()) {
-            MealIngredients ingredient = new MealIngredients();
-            ingredient.setIngredientName(mi.getIngredient().getName());
-            ingredient.setQuantity(mi.getQuantity());
-            mealIngredients.add(ingredient);
-        }
+        List<MealIngredients> mealIngredients = getMealIngredients(meal);
 
         return MealResponse.builder()
                 .id(meal.getId())
@@ -57,6 +51,26 @@ public final class DtoConverter {
                 .categoryName(categoryNames)
                 .build();
     }
+
+    private static List<MealIngredients> getMealIngredients(Meal meal) {
+        List<MealIngredients> mealIngredients = new ArrayList<>();
+        for (MealIngredient mi : meal.getMealIngredients()) {
+            MealIngredients ingredient = new MealIngredients();
+            ingredient.setIngredientId(mi.getIngredient().getId());
+            ingredient.setIngredientName(mi.getIngredient().getName());
+            ingredient.setQuantity(mi.getQuantity());
+            ingredient.setUnit(mi.getIngredient().getDescription());
+            mealIngredients.add(ingredient);
+        }
+        return mealIngredients;
+    }
+
+//    public static MealPlanDayResponse convertToDto(MealPlanDay mealPlanDay) {
+//        return MealPlanDayResponse.builder()
+//                .mealPlanId(mealPlanDay.getMealPlanId())
+//                .date(mealPlanDay.getDate().toString())
+//                .build();
+//    }
 
     public static CategoryResponse convertToDto(Category category) {
         return CategoryResponse.builder()

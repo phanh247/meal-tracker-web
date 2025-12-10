@@ -6,15 +6,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MealInstruction {
-    @JsonProperty("step")
-    private int step;
+public class MealInstruction implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-    @JsonProperty("instruction")
+    private int step;
     private String instruction;
 
     @Override

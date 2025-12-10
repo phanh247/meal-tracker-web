@@ -1,0 +1,325 @@
+{
+  "info": {
+    "_postman_id": "chatbot-simplified",
+    "name": "Meal Tracker Chatbot - Simplified",
+    "description": "Simplified test collection for AI-powered meal recommendation chatbot",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "🔧 HEALTH CHECK & INFO",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/chatbot/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "chatbot", "health"]
+            }
+          }
+        },
+        {
+          "name": "Get Chatbot Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/chatbot/info",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "chatbot", "info"]
+            }
+          }
+        },
+        {
+          "name": "Validate User Info",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"age\": 30,\n  \"weight\": 75,\n  \"height\": 175,\n  \"gender\": \"MALE\",\n  \"activityLevel\": \"MODERATELY_ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/chatbot/validate",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "chatbot", "validate"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🤖 MEAL RECOMMENDATIONS",
+      "item": [
+        {
+          "name": "Weight Loss - Male",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userHealthInfo\": {\n    \"age\": 30,\n    \"weight\": 85,\n    \"height\": 175,\n    \"gender\": \"MALE\",\n    \"activityLevel\": \"MODERATELY_ACTIVE\",\n    \"fitnessGoal\": \"WEIGHT_LOSS\"\n  },\n  \"query\": \"What meals should I eat for weight loss?\",\n  \"limitResults\": 5\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/chatbot/recommend",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "chatbot", "recommend"]
+            }
+          }
+        },
+        {
+          "name": "Weight Loss - Female",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userHealthInfo\": {\n    \"age\": 28,\n    \"weight\": 70,\n    \"height\": 165,\n    \"gender\": \"FEMALE\",\n    \"activityLevel\": \"LIGHTLY_ACTIVE\",\n    \"fitnessGoal\": \"WEIGHT_LOSS\"\n  },\n  \"query\": \"Recommend meals for my weight loss journey\",\n  \"limitResults\": 5\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/chatbot/recommend",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "chatbot", "recommend"]
+            }
+          }
+        },
+        {
+          "name": "Muscle Gain - Very Active",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userHealthInfo\": {\n    \"age\": 25,\n    \"weight\": 70,\n    \"height\": 180,\n    \"gender\": \"MALE\",\n    \"activityLevel\": \"VERY_ACTIVE\",\n    \"fitnessGoal\": \"WEIGHT_GAIN\"\n  },\n  \"query\": \"What meals help me build muscle?\",\n  \"limitResults\": 5\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/chatbot/recommend",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "chatbot", "recommend"]
+            }
+          }
+        },
+        {
+          "name": "Maintenance - Moderate Activity",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userHealthInfo\": {\n    \"age\": 35,\n    \"weight\": 72,\n    \"height\": 172,\n    \"gender\": \"MALE\",\n    \"activityLevel\": \"MODERATELY_ACTIVE\",\n    \"fitnessGoal\": \"MAINTENANCE\"\n  },\n  \"query\": \"Suggest balanced meals for daily maintenance\",\n  \"limitResults\": 5\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/chatbot/recommend",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "chatbot", "recommend"]
+            }
+          }
+        },
+        {
+          "name": "Extremely Active - Muscle Building",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userHealthInfo\": {\n    \"age\": 27,\n    \"weight\": 75,\n    \"height\": 182,\n    \"gender\": \"MALE\",\n    \"activityLevel\": \"EXTREMELY_ACTIVE\",\n    \"fitnessGoal\": \"WEIGHT_GAIN\"\n  },\n  \"query\": \"High calorie meals for intensive training\",\n  \"limitResults\": 5\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/chatbot/recommend",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "chatbot", "recommend"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "⚡ QUICK RECOMMENDATIONS",
+      "item": [
+        {
+          "name": "Quick Recommend - Sedentary Female",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"age\": 32,\n  \"weight\": 68,\n  \"height\": 163,\n  \"gender\": \"FEMALE\",\n  \"activityLevel\": \"SEDENTARY\",\n  \"fitnessGoal\": \"WEIGHT_LOSS\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/chatbot/quick-recommend?query=What%20should%20I%20eat%20today?&limit=3",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "chatbot", "quick-recommend"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "What should I eat today?"
+                },
+                {
+                  "key": "limit",
+                  "value": "3"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Quick Recommend - Lightly Active Male",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"age\": 40,\n  \"weight\": 80,\n  \"height\": 178,\n  \"gender\": \"MALE\",\n  \"activityLevel\": \"LIGHTLY_ACTIVE\",\n  \"fitnessGoal\": \"MAINTENANCE\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/chatbot/quick-recommend?query=Healthy%20meal%20ideas&limit=5",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "chatbot", "quick-recommend"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "Healthy meal ideas"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Quick Recommend - Very Active Female",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"age\": 26,\n  \"weight\": 62,\n  \"height\": 168,\n  \"gender\": \"FEMALE\",\n  \"activityLevel\": \"VERY_ACTIVE\",\n  \"fitnessGoal\": \"WEIGHT_GAIN\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/chatbot/quick-recommend?query=High%20energy%20meals&limit=4",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "chatbot", "quick-recommend"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "High energy meals"
+                },
+                {
+                  "key": "limit",
+                  "value": "4"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📋 REFERENCE DATA",
+      "item": [
+        {
+          "name": "Activity Levels",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/chatbot/info",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "chatbot", "info"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ]
+}

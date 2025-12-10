@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/ingredients")
 @RequiredArgsConstructor
@@ -43,5 +45,11 @@ public class IngredientController {
     public ResponseEntity<Void> deleteIngredient(@PathVariable Long id) throws IngredientManagementException {
         ingredientService.deleteIngredient(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<IngredientResponse>> searchIngredients(@RequestParam(required = false) String query) {
+        List<IngredientResponse> ingredients = ingredientService.searchIngredients(query);
+        return ResponseEntity.ok(ingredients);
     }
 }

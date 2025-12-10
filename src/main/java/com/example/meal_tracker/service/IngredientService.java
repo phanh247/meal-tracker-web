@@ -6,6 +6,8 @@ import com.example.meal_tracker.exception.IngredientManagementException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface IngredientService {
 
     IngredientResponse createIngredient(IngredientRequest request) throws IngredientManagementException;
@@ -17,4 +19,6 @@ public interface IngredientService {
     IngredientResponse updateIngredient(Long id, IngredientRequest request) throws IngredientManagementException;
 
     void deleteIngredient(Long id) throws IngredientManagementException;
+
+    List<IngredientResponse> searchIngredients(String query);
 }

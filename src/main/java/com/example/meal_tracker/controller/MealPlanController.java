@@ -49,12 +49,12 @@ public class MealPlanController {
         }
     }
 
-    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<MealPlanResponse>> getMealPlans(Pageable pageable,
-            Long userId) {
-        LOGGER.info("Received request to get all meal plans {} {}", pageable.toString(), userId);
-        return ResponseEntity.ok(mealPlanService.getMealPlans(pageable, userId));
-    }
+//    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<Page<MealPlanResponse>> getMealPlans(Pageable pageable,
+//            Long userId) {
+//        LOGGER.info("Received request to get all meal plans {} {}", pageable.toString(), userId);
+//        return ResponseEntity.ok(mealPlanService.getMealPlans(pageable, userId));
+//    }
 
     @GetMapping(value = "/detail/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MealPlanResponse> getMealPlan(

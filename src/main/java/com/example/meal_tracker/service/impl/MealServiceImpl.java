@@ -57,9 +57,9 @@ public class MealServiceImpl implements MealService {
 
         // Check whether categories existed or not
         Set<Category> mealCategories = new HashSet<>();
-        for (String name : request.getCategoryName()) {
-            Category category = categoryRepository.findByName(name)
-                    .orElseThrow(() -> new NotFoundException(CATEGORY_NOT_FOUND + name));
+        for (Integer item : request.getCategories()) {
+            Category category = categoryRepository.findById(Long.valueOf(item))
+                    .orElseThrow(() -> new NotFoundException(CATEGORY_NOT_FOUND + item));
             mealCategories.add(category);
         }
 
@@ -113,7 +113,8 @@ public class MealServiceImpl implements MealService {
 
     @Override
     public Page<MealResponse> getMeals(Pageable pageable) {
-        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("id"));
+        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC,
+                "createdAt"));
         Page<Meal> meals = mealRepository.findAll(pageable);
         return meals.map(DtoConverter::convertToDto);
     }

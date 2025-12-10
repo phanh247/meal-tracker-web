@@ -19,6 +19,7 @@ public class IngredientResponse {
                 .id(ingredient.getId())
                 .name(ingredient.getName())
                 .calories(ingredient.getCalories())
+                .description(ingredient.getDescription())
                 .build();
     }
 }

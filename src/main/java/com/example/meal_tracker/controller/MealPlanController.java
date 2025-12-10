@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/mealplan")
+@RequestMapping("/api/meal-plan")
 @RequiredArgsConstructor
 public class MealPlanController {
     private static final Logger LOGGER = LoggerFactory.getLogger(MealPlanController.class);
@@ -49,12 +49,18 @@ public class MealPlanController {
         }
     }
 
-//    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<Page<MealPlanResponse>> getMealPlans(Pageable pageable,
-//            Long userId) {
-//        LOGGER.info("Received request to get all meal plans {} {}", pageable.toString(), userId);
-//        return ResponseEntity.ok(mealPlanService.getMealPlans(pageable, userId));
-//    }
+    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getMealPlans(Pageable pageable,
+            Long userId) {
+        try {
+            LOGGER.info("Received request to get all meal plans {} {}",
+                    pageable.toString(), userId);
+            return ResponseEntity.ok(mealPlanService.getMealPlans(pageable, userId));
+        } catch (BadRequestException e) {
+            LOGGER.error("Error deleting meal plan: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
 
     @GetMapping(value = "/detail/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MealPlanResponse> getMealPlan(

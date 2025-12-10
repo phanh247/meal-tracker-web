@@ -13,7 +13,7 @@ import org.springframework.data.domain.Pageable;
 public interface MealPlanItemService {
     MealPlanItemResponse addNewMealPlanItem(AddMealPlanItemRequest addMealPlanItemRequest) throws BadRequestException;
 
-    Page<MealPlanItemResponse> getMealPlanItems(Pageable pageable, Long mealPlanId, LocalDate date);
+    Page<MealPlanItemResponse> getMealPlanItems(Pageable pageable, Long mealPlanId, LocalDate date) throws BadRequestException;
 
     void updateMealPlanItem(Long mealPlanItemId, UpdateMealPlanItemRequest updateMealPlanItemRequest)
             throws BadRequestException;

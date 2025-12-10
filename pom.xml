@@ -208,21 +208,28 @@
                 <configuration>
                     <source>17</source>
                     <target>17</target>
+
                     <compilerArgs>
                     <arg>--add-opens</arg>
                     <arg>jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
-                </compilerArgs>
+                    </compilerArgs>
+                    
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <!-- <version>${lombok.version}</version> -->
-                             <version>1.18.34</version> 
+                            <version>${lombok.version}</version>
                         </path>
                         <path>
                             <groupId>org.mapstruct</groupId>
                             <artifactId>mapstruct-processor</artifactId>
                             <version>1.5.5.Final</version>
+                        </path>
+                        <!-- Thêm binding cho Lombok + MapStruct -->
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>0.2.0</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
@@ -230,3 +237,5 @@
         </plugins>
     </build>
 </project>
+
+

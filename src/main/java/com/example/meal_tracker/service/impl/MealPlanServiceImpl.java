@@ -81,7 +81,7 @@ public class MealPlanServiceImpl implements MealPlanService {
     }
 
     @Override
-    public Page<MealPlanResponse> getMealPlans(Pageable pageable, Long userId) {
+    public Page<MealPlanResponse> getMealPlans(Pageable pageable, Long userId) throws BadRequestException {
         pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
         Page<MealPlan> mealPlans = mealPlanRepository.findByUserId(pageable, userId);
         return mealPlans.map(DtoConverter::convertToDto);

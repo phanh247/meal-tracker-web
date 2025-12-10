@@ -28,10 +28,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/mealplanitem")
+@RequestMapping("/api/meal-plan-item")
 @RequiredArgsConstructor
 public class MealPlanItemController {
     private static final Logger LOGGER = LoggerFactory.getLogger(MealPlanItemController.class);
@@ -78,9 +79,19 @@ public class MealPlanItemController {
     }
 
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<MealPlanItemResponse>> getMealPlanItems(Pageable pageable,
-            Long mealPlanId, LocalDate date) {
-        LOGGER.info("Received request to get all meal plan item {} {}", pageable.toString(), mealPlanId, date);
-        return ResponseEntity.ok(mealPlanItemService.getMealPlanItems(pageable, mealPlanId, date));
+    public ResponseEntity<?> getMealPlanItems(
+            Pageable pageable,
+            @RequestParam(required = false) Long mealPlanId,
+            @RequestParam(required = false) LocalDate date) {
+
+        LOGGER.info("Received request to get all meal plan items - pageable: {}, mealPlanId: {}, date: {}",
+                pageable, mealPlanId, date);
+
+        try {
+            Page<MealPlanItemResponse> result = mealPlanItemService.getMealPlanItems(pageable, mealPlanId, date);
+            return ResponseEntity.ok(result);
+        } catch (BadRequestException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

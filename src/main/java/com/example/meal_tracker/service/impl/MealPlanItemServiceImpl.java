@@ -102,11 +102,10 @@ public class MealPlanItemServiceImpl implements MealPlanItemService {
     }
 
     @Override
-    public Page<MealPlanItemResponse> getMealPlanItems(Pageable pageable, Long mealPlanId, LocalDate date) {
+    public Page<MealPlanItemResponse> getMealPlanItems(Pageable pageable, Long mealPlanId, LocalDate date) throws BadRequestException {
         pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
         if (date != null) {
-            Page<MealPlanItem> mealPlanItems = mealPlanItemRepository.findByMealPlanIdAndDate(mealPlanId,
-                    Date.valueOf(date));
+            Page<MealPlanItem> mealPlanItems = mealPlanItemRepository.findByMealPlanIdAndDate(mealPlanId,Date.valueOf(date), pageable);
             return mealPlanItems.map(DtoConverter::convertToDto);
         }
         Page<MealPlanItem> mealPlanItems = mealPlanItemRepository.findByMealPlanId(pageable, mealPlanId);

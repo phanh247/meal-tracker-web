@@ -27,13 +27,13 @@ public class AddMealRequest implements Serializable {
     private String cookingTime;
     private int servings;
     private List<String> nutrition;
-    private List<String> categoryName;
+    private List<Integer> categories;
     private MultipartFile image;
 
     @Override
     public String toString() {
         return "AddMealRequest{" +
-                "categoryName=" + categoryName +
+                "categories=" + categories +
                 ", mealName='" + mealName + '\'' +
                 ", mealDescription='" + mealDescription + '\'' +
                 ", mealIngredients=" + mealIngredients +

@@ -56,7 +56,7 @@ public class MealController {
 
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<MealResponse>> getMeals(@RequestParam(defaultValue = "0") int page,
-                                                       @RequestParam(defaultValue = "11") int size) {
+                                                       @RequestParam(defaultValue = "12") int size) {
         LOGGER.info("Received request to get all meals");
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(mealService.getMeals(pageable));

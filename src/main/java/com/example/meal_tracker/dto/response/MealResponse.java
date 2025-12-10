@@ -16,37 +16,16 @@ public class MealResponse implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @JsonProperty("id")
     private Long id;
-
-    @JsonProperty("meal_name")
     private String name;
-
-    @JsonProperty("meal_description")
     private String description;
-
-    @JsonProperty("calories")
     private float calories;
-
-    @JsonProperty("image_url")
     private String imageUrl;
-
-    @JsonProperty("meal_ingredients")
     private List<MealIngredients> mealIngredients;
-
-    @JsonProperty("meal_instructions")
     private List<MealInstruction> mealInstructions;
-
-    @JsonProperty("cooking_time")
     private String cookingTime;
-
-    @JsonProperty("servings")
     private int servings;
-
-    @JsonProperty("nutrition")
     private List<String> nutrition;
-
-    @JsonProperty("category_name")
     private List<String> categoryName;
 
 }

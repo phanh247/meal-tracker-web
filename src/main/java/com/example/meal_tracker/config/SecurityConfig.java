@@ -24,7 +24,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Tắt CSRF (vì dùng JWT)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**").permitAll() // Cho phép tất cả truy cập vào API đăng ký/đăng nhập
+                        .requestMatchers("/api/auth/**").permitAll() // Cho phép tất cả truy cập vào API đăng ký/đăng nhập
                         .anyRequest().authenticated()  // Tất cả các request khác đều cần xác thực
                 )
                 // Do không lưu session nên Cấu hình session management là STATELESS

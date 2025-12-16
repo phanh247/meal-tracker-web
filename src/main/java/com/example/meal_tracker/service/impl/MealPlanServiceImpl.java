@@ -49,23 +49,35 @@ public class MealPlanServiceImpl implements MealPlanService {
     public void updateMealPlan(Long mealPlanId, UpdateMealPlanRequest updateMealPlanRequest)
             throws BadRequestException {
 
-        if (mealPlanRepository.findById(mealPlanId).isEmpty()) {
-            LOGGER.info(MEAL_PLAN_NOT_FOUND, mealPlanId);
-            throw new BadRequestException(String.format(MEAL_PLAN_NOT_FOUND, mealPlanId));
+        MealPlan mealPlan = mealPlanRepository.findById(mealPlanId)
+                .orElseThrow(() -> {
+                    LOGGER.info(MEAL_PLAN_NOT_FOUND, mealPlanId);
+                    return new BadRequestException(
+                            String.format(MEAL_PLAN_NOT_FOUND, mealPlanId));
+                });
+
+        Boolean newIsActive = updateMealPlanRequest.getIsActive();
+
+        if (newIsActive != null
+                && !newIsActive.equals(mealPlan.getIsActive())) {
+
+            if (Boolean.TRUE.equals(newIsActive)) {
+                // 🔁 Tắt plan đang active khác
+                mealPlanRepository.deactivateOtherMealPlans(mealPlanId);
+                mealPlan.setIsActive(true);
+            } else {
+                // ⬇️ Chỉ tắt plan hiện tại
+                mealPlan.setIsActive(false);
+            }
         }
 
-        mealPlanRepository.findById(mealPlanId).map(mealPlan -> {
-            mealPlan.setName(updateMealPlanRequest.getName());
-            mealPlan.setTargetCalories(updateMealPlanRequest.getTargetCalories());
-            mealPlan.setStartDate(Date.valueOf(updateMealPlanRequest.getStartDate()));
-            mealPlan.setEndDate(Date.valueOf(updateMealPlanRequest.getEndDate()));
-            mealPlan.setNote(updateMealPlanRequest.getNote());
-            mealPlan.setPlanType(updateMealPlanRequest.getPlanType());
-            mealPlan.setIsActive(updateMealPlanRequest.getIsActive());
-
-            return mealPlanRepository.save(mealPlan);
-        });
-
+        mealPlan.setName(updateMealPlanRequest.getName());
+        mealPlan.setTargetCalories(updateMealPlanRequest.getTargetCalories());
+        mealPlan.setStartDate(Date.valueOf(updateMealPlanRequest.getStartDate()));
+        mealPlan.setEndDate(Date.valueOf(updateMealPlanRequest.getEndDate()));
+        mealPlan.setNote(updateMealPlanRequest.getNote());
+        mealPlan.setPlanType(updateMealPlanRequest.getPlanType());
+        mealPlanRepository.save(mealPlan);
     }
 
     @Override

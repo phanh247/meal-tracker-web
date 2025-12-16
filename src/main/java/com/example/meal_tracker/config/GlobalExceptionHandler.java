@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
         Map<String, Object> errors = new HashMap<>();
 
         errors.put("status", "FAILURE");
-        errors.put("message", "Dữ liệu không hợp lệ");
+        errors.put("message", "Mật khẩu tối đa 10 ký tự");
         errors.put("user_id", null);
         errors.put("access_token", null);
 

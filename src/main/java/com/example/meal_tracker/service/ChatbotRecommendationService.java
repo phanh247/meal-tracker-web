@@ -1,7 +1,9 @@
 package com.example.meal_tracker.service;
 
+import com.example.meal_tracker.dto.request.ChatMessageRequest;
 import com.example.meal_tracker.dto.request.MealRecommendationRequest;
 import com.example.meal_tracker.dto.request.UserHealthInfoRequest;
+import com.example.meal_tracker.dto.response.ChatMessageResponse;
 import com.example.meal_tracker.dto.response.ChatbotMealRecommendationResponse;
 import com.example.meal_tracker.dto.response.MealRecommendationResponse;
 import com.example.meal_tracker.exception.NotFoundException;
@@ -22,6 +24,13 @@ public interface ChatbotRecommendationService {
     ChatbotMealRecommendationResponse getAIRecommendations(UserHealthInfoRequest userInfo, 
                                                            String query,
                                                            Integer limit) throws NotFoundException;
+    
+    /**
+     * Process chat message
+     * If message contains "5 món ăn", returns meal recommendations
+     * Otherwise returns general chat response
+     */
+    ChatMessageResponse processChatMessage(ChatMessageRequest request) throws NotFoundException;
     
     /**
      * Score and rank meals based on user profile

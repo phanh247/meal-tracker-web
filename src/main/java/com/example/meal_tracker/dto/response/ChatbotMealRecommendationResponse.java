@@ -9,6 +9,7 @@ import java.util.List;
 
 /**
  * DTO for chatbot meal recommendation response
+ * Returns top 5 recommended meals in JSON format with nutritional summary
  */
 @Data
 @AllArgsConstructor
@@ -16,10 +17,10 @@ import java.util.List;
 @Builder
 public class ChatbotMealRecommendationResponse {
     
-    private String aiResponse; // Natural language response from AI
     private List<MealRecommendationResponse> recommendations; // Top 5 meals
     private Integer totalRecommendations;
     private Double estimatedTotalCalories; // Sum of all recommended meals' calories
     private String nutritionalSummary; // Summary of nutritional value
     private Long timestamp;
 }
+

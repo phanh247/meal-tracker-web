@@ -1,7 +1,9 @@
 package com.example.meal_tracker.controller;
 
+import com.example.meal_tracker.dto.request.ChatMessageRequest;
 import com.example.meal_tracker.dto.request.MealRecommendationRequest;
 import com.example.meal_tracker.dto.request.UserHealthInfoRequest;
+import com.example.meal_tracker.dto.response.ChatMessageResponse;
 import com.example.meal_tracker.dto.response.ChatbotMealRecommendationResponse;
 import com.example.meal_tracker.exception.NotFoundException;
 import com.example.meal_tracker.service.ChatbotRecommendationService;
@@ -14,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * REST Controller for AI-powered meal recommendations chatbot
- * Provides endpoints for personalized meal recommendations based on user health profile
+ * Simplified to provide personalized top 5 meal recommendations based on user health profile
  */
 @Slf4j
 @RestController
@@ -26,60 +28,75 @@ public class ChatbotController {
     private final ChatbotRecommendationService chatbotRecommendationService;
     
     /**
-     * Get meal recommendations with full chatbot response
-     * POST /api/chatbot/recommend
+     * Chat endpoint - Process user messages
+     * If message contains "5 món ăn", returns meal recommendations
+     * Otherwise returns general chat response
      * 
-     * @param request Contains user health info and query
-     * @return ChatbotMealRecommendationResponse with AI response and top 5 meals
+     * POST /api/chatbot/chat
+     * 
+     * @param request ChatMessageRequest with message and optional userHealthInfo
+     * @return ChatMessageResponse with AI response
      */
-    @PostMapping(value = "/recommend", 
+    @PostMapping(value = "/chat", 
                  consumes = MediaType.APPLICATION_JSON_VALUE,
                  produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getMealRecommendations(@RequestBody MealRecommendationRequest request) {
+    public ResponseEntity<?> chatMessage(@RequestBody ChatMessageRequest request) {
         try {
-            LOGGER.info("Received meal recommendation request for user");
-            ChatbotMealRecommendationResponse response = chatbotRecommendationService
-                    .getMealRecommendations(request);
+            log.info("Received chat message");
+            
+            ChatMessageResponse response = chatbotRecommendationService
+                    .processChatMessage(request);
+            
+            log.info("Chat response type: {}", response.getResponseType());
             return ResponseEntity.ok(response);
         } catch (NotFoundException e) {
-            LOGGER.error("Error getting meal recommendations: {}", e.getMessage());
+            log.error("No meals found: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("No meals found in database");
+                    .body(new ErrorResponse("No meals found in database"));
         } catch (Exception e) {
-            LOGGER.error("Unexpected error in meal recommendation", e);
+            log.error("Error processing chat: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error processing meal recommendation: " + e.getMessage());
+                    .body(new ErrorResponse("Error processing message: " + e.getMessage()));
         }
     }
     
     /**
-     * Quick recommendation endpoint with simplified input
-     * POST /api/chatbot/quick-recommend
+     * Get top 5 meal recommendations based on user health profile
+     * POST /api/chatbot/recommend
+     * 
+     * Request Body: UserHealthInfoRequest with age, weight, height, gender, activityLevel, fitnessGoal
+     * Response: ChatbotMealRecommendationResponse with top 5 recommended meals in JSON format
      * 
      * @param userInfo User health information
-     * @param query Natural language query from user
-     * @param limit Number of recommendations (default: 5)
-     * @return ChatbotMealRecommendationResponse
+     * @return JSON with top 5 meal recommendations
      */
-    @PostMapping(value = "/quick-recommend",
+    @PostMapping(value = "/recommend", 
                  consumes = MediaType.APPLICATION_JSON_VALUE,
                  produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> quickRecommend(@RequestBody UserHealthInfoRequest userInfo,
-                                            @RequestParam(defaultValue = "What meals should I eat today?") String query,
-                                            @RequestParam(defaultValue = "5") Integer limit) {
+    public ResponseEntity<?> getMealRecommendations(@RequestBody UserHealthInfoRequest userInfo) {
         try {
-            LOGGER.info("Received quick recommendation request");
+            log.info("Received meal recommendation request");
+            
+            // Create recommendation request
+            MealRecommendationRequest request = MealRecommendationRequest.builder()
+                    .userHealthInfo(userInfo)
+                    .limitResults(5)
+                    .build();
+            
+            // Get recommendations from service
             ChatbotMealRecommendationResponse response = chatbotRecommendationService
-                    .getAIRecommendations(userInfo, query, limit);
+                    .getMealRecommendations(request);
+            
+            log.info("Returning {} meal recommendations", response.getTotalRecommendations());
             return ResponseEntity.ok(response);
         } catch (NotFoundException e) {
-            LOGGER.error("Error in quick recommendation: {}", e.getMessage());
+            log.error("No meals found: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("No meals found in database");
+                    .body(new ErrorResponse("No meals found in database"));
         } catch (Exception e) {
-            LOGGER.error("Unexpected error in quick recommendation", e);
+            log.error("Error processing meal recommendation: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error processing quick recommendation: " + e.getMessage());
+                    .body(new ErrorResponse("Error processing recommendation: " + e.getMessage()));
         }
     }
     
@@ -90,54 +107,6 @@ public class ChatbotController {
     @GetMapping("/health")
     public ResponseEntity<?> healthCheck() {
         return ResponseEntity.ok(new HealthCheckResponse("Chatbot service is running"));
-    }
-    
-    /**
-     * Get recommendation criteria information
-     * GET /api/chatbot/info
-     */
-    @GetMapping("/info")
-    public ResponseEntity<?> getInfo() {
-        return ResponseEntity.ok(new ChatbotInfoResponse(
-                "AI-Powered Meal Recommendation Chatbot",
-                "Provides personalized meal recommendations based on user health profile, dietary preferences, and fitness goals",
-                new String[]{
-                        "Age, Weight, Height, Gender",
-                        "Activity Level and Fitness Goals",
-                        "Dietary Preferences (Omnivore, Vegetarian, Vegan, Pescatarian)",
-                        "Health Conditions (Diabetes, Hypertension, High Cholesterol, etc.)",
-                        "Allergies and Allergen Sensitivities",
-                        "Daily Calorie Requirements"
-                },
-                new String[]{
-                        "/api/chatbot/recommend - Full recommendation with conversation",
-                        "/api/chatbot/quick-recommend - Quick recommendation with user info"
-                }
-        ));
-    }
-    
-    /**
-     * Validate user health information
-     * POST /api/chatbot/validate
-     */
-    @PostMapping(value = "/validate",
-                 consumes = MediaType.APPLICATION_JSON_VALUE,
-                 produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> validateUserInfo(@RequestBody UserHealthInfoRequest userInfo) {
-        try {
-            ValidationResponse response = new ValidationResponse();
-            response.valid = true;
-            response.bmi = userInfo.calculateBMI();
-            response.bmiCategory = userInfo.getBMICategory();
-            response.dailyCalories = userInfo.calculateDailyCalories();
-            response.message = "User health information is valid";
-            
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            LOGGER.error("Error validating user info", e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Invalid user health information: " + e.getMessage());
-        }
     }
     
     // Inner classes for response bodies
@@ -152,23 +121,7 @@ public class ChatbotController {
     @lombok.Data
     @lombok.AllArgsConstructor
     @lombok.NoArgsConstructor
-    public static class ChatbotInfoResponse {
-        private String name;
-        private String description;
-        private String[] inputParameters;
-        private String[] endpoints;
+    public static class ErrorResponse {
+        private String error;
     }
-    
-    @lombok.Data
-    @lombok.AllArgsConstructor
-    @lombok.NoArgsConstructor
-    public static class ValidationResponse {
-        private boolean valid;
-        private Double bmi;
-        private String bmiCategory;
-        private Double dailyCalories;
-        private String message;
-    }
-    
-    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(ChatbotController.class);
 }

@@ -146,4 +146,81 @@ public class AIPromptBuilder {
                 userInfo.getFitnessGoal()
         );
     }
+    
+    /**
+     * Build a prompt for getting top 5 meal recommendations
+     * Returns JSON format with top 5 meals based on user profile and available meals
+     */
+    public String buildTop5MealsPrompt(UserHealthInfoRequest userInfo,
+                                      List<MealRecommendationResponse> allMeals) {
+        StringBuilder prompt = new StringBuilder();
+        
+        prompt.append("You are a nutritionist AI. Based on the user's health profile and available meals, ");
+        prompt.append("recommend the TOP 5 BEST meals for this user.\n\n");
+        
+        // User Profile Section
+        prompt.append("=== USER HEALTH PROFILE ===\n");
+        prompt.append(String.format("Age: %d years\n", userInfo.getAge()));
+        prompt.append(String.format("Weight: %.1f kg\n", userInfo.getWeight()));
+        prompt.append(String.format("Height: %.1f cm\n", userInfo.getHeight()));
+        prompt.append(String.format("Gender: %s\n", userInfo.getGender()));
+        prompt.append(String.format("BMI: %.1f (%s)\n", userInfo.calculateBMI(), userInfo.getBMICategory()));
+        prompt.append(String.format("Activity Level: %s\n", userInfo.getActivityLevel()));
+        prompt.append(String.format("Fitness Goal: %s\n", userInfo.getFitnessGoal()));
+        prompt.append(String.format("Daily Calorie Needs: %.0f calories\n", userInfo.calculateDailyCalories()));
+        
+        prompt.append("\n=== AVAILABLE MEALS IN DATABASE ===\n");
+        for (int i = 0; i < allMeals.size(); i++) {
+            MealRecommendationResponse meal = allMeals.get(i);
+            prompt.append(String.format("%d. %s\n", i + 1, meal.getMealName()));
+            prompt.append(String.format("   Calories: %.0f\n", meal.getCalories()));
+            if (meal.getDescription() != null && !meal.getDescription().isEmpty()) {
+                prompt.append(String.format("   Description: %s\n", meal.getDescription()));
+            }
+            prompt.append("\n");
+        }
+        
+        prompt.append("=== TASK ===\n");
+        prompt.append("Select and rank the TOP 5 meals that best match this user's profile.\n");
+        prompt.append("Consider:\n");
+        prompt.append("1. Caloric alignment with their daily needs (%.0f cal/day)\n".formatted(userInfo.calculateDailyCalories()));
+        prompt.append("2. Suitability for their fitness goal (%s)\n".formatted(userInfo.getFitnessGoal()));
+        prompt.append("3. Nutritional value for their health profile\n");
+        
+        prompt.append("\n=== RESPONSE FORMAT ===\n");
+        prompt.append("Return ONLY a valid JSON array (no additional text) with this exact structure:\n");
+        prompt.append("[\n");
+        prompt.append("  {\n");
+        prompt.append("    \"mealName\": \"meal name\",\n");
+        prompt.append("    \"calories\": 0,\n");
+        prompt.append("    \"matchScore\": 0.0,\n");
+        prompt.append("    \"recommendationReason\": \"reason\"\n");
+        prompt.append("  }\n");
+        prompt.append("]\n");
+        
+        return prompt.toString();
+    }
+    
+    /**
+     * Build a simple prompt for general chat messages
+     * User can ask nutrition questions without needing to provide full health profile
+     */
+    public String buildChatMessagePrompt(String userMessage) {
+        StringBuilder prompt = new StringBuilder();
+        
+        prompt.append("You are a helpful nutrition and meal planning expert. ");
+        prompt.append("Answer the user's question about nutrition, meals, and diet in a friendly and informative way.\n");
+        prompt.append("Provide practical advice and tips when relevant.\n\n");
+        
+        prompt.append("=== USER MESSAGE ===\n");
+        prompt.append(userMessage).append("\n\n");
+        
+        prompt.append("=== INSTRUCTIONS ===\n");
+        prompt.append("1. Provide a clear, concise answer\n");
+        prompt.append("2. Be friendly and approachable\n");
+        prompt.append("3. Provide practical suggestions when applicable\n");
+        prompt.append("4. Avoid medical advice, focus on general nutrition tips\n");
+        
+        return prompt.toString();
+    }
 }

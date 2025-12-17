@@ -18,6 +18,13 @@ public interface MealPlanRepository extends JpaRepository<MealPlan, Long> {
 
     Page<MealPlan> findByUserId(Pageable pageable, Long userId);
 
+    @Query("""
+            SELECT mp FROM MealPlan mp
+            WHERE mp.userId = :userId
+            AND mp.isActive = true
+            """)
+    Optional<MealPlan> findActiveMealPlanByUserId(@Param("userId") Long userId);
+
     @Modifying
     @Query("""
                 update MealPlan m

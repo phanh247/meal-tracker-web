@@ -3,7 +3,9 @@ package com.example.meal_tracker.service.impl;
 import com.example.meal_tracker.common.ErrorConstant;
 import com.example.meal_tracker.dto.request.AddMealPlanItemRequest;
 import com.example.meal_tracker.dto.request.UpdateMealPlanItemRequest;
+import com.example.meal_tracker.dto.response.ActiveMealPlanWithMealsResponse;
 import com.example.meal_tracker.dto.response.MealPlanItemResponse;
+import com.example.meal_tracker.dto.response.MealPlanItemWithMealDetailsResponse;
 import com.example.meal_tracker.entity.Meal;
 import com.example.meal_tracker.entity.MealPlan;
 import com.example.meal_tracker.entity.MealPlanItem;
@@ -28,7 +30,10 @@ import static com.example.meal_tracker.common.ErrorConstant.MEAL_PLAN_ITEM_NOT_F
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -119,5 +124,64 @@ public class MealPlanItemServiceImpl implements MealPlanItemService {
             throw new BadRequestException(String.format(MEAL_PLAN_ITEM_NOT_FOUND, mealPlanItemId));
         }
         mealPlanItemRepository.deleteById(mealPlanItemId);
-    };
+    }
+
+    @Override
+    public ActiveMealPlanWithMealsResponse getActiveMealPlanWithMeals(Long userId) throws BadRequestException {
+        // Get active meal plan for user
+        Optional<MealPlan> activeMealPlan = mealPlanRepository.findActiveMealPlanByUserId(userId);
+        if (activeMealPlan.isEmpty()) {
+            LOGGER.info("No active meal plan found for user with id '{}'.", userId);
+            throw new BadRequestException(
+                    String.format("No active meal plan found for user with id '%s'.", userId));
+        }
+
+        MealPlan mealPlan = activeMealPlan.get();
+
+        // Get all meal plan items for active meal plan
+        List<MealPlanItem> mealPlanItems = mealPlanItemRepository.findAllByActiveMealPlanAndUserId(userId);
+
+        // Convert to MealPlanItemWithMealDetailsResponse and group by date
+        Map<String, List<MealPlanItemWithMealDetailsResponse>> mealsByDate = mealPlanItems.stream()
+                .map(mpi -> {
+                    Meal meal = mpi.getMeal();
+                    List<String> categoryNames = meal.getCategories().stream()
+                            .map(cat -> cat.getName())
+                            .collect(Collectors.toList());
+
+                    return MealPlanItemWithMealDetailsResponse.builder()
+                            .mealPlanItemId(mpi.getId())
+                            .mealId(meal.getId())
+                            .mealName(meal.getName())
+                            .calories(meal.getCalories())
+                            .mealDescription(meal.getDescription())
+                            .imageUrl(meal.getImageUrl())
+                            .cookingTime(meal.getCookingTime())
+                            .servings(meal.getServings())
+                            .mealType(mpi.getMealType())
+                            .mealDate(mpi.getMealDate())
+                            .categoryNames(categoryNames)
+                            .build();
+                })
+                .collect(Collectors.groupingBy(
+                        mealDetail -> mealDetail.getMealDate().toString(),
+                        Collectors.toList()
+                ));
+
+        // Build response
+        return ActiveMealPlanWithMealsResponse.builder()
+                .id(mealPlan.getId())
+                .name(mealPlan.getName())
+                .userId(mealPlan.getUserId())
+                .targetCalories(mealPlan.getTargetCalories())
+                .startDate(mealPlan.getStartDate())
+                .endDate(mealPlan.getEndDate())
+                .note(mealPlan.getNote())
+                .planType(mealPlan.getPlanType())
+                .isActive(mealPlan.getIsActive())
+                .mealsByDate(mealsByDate)
+                .createdAt(mealPlan.getCreatedAt())
+                .updatedAt(mealPlan.getUpdatedAt())
+                .build();
+    }
 }

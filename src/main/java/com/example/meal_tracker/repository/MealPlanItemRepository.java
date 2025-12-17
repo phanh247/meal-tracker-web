@@ -3,6 +3,7 @@ package com.example.meal_tracker.repository;
 import com.example.meal_tracker.entity.MealPlanItem;
 
 import java.sql.Date;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +19,7 @@ public interface MealPlanItemRepository extends JpaRepository<MealPlanItem, Long
     @Query("""
             SELECT mpi FROM MealPlanItem mpi
             WHERE mpi.mealPlan.id = :id
-            AND :date BETWEEN mpi.mealPlan.startDate AND mpi.mealPlan.endDate
+            AND mpi.mealDate = :date
             """)
     Page<MealPlanItem> findByMealPlanIdAndDate(
             @Param("id") Long id,
@@ -26,5 +27,13 @@ public interface MealPlanItemRepository extends JpaRepository<MealPlanItem, Long
             Pageable pageable);
 
     Boolean existsByMealPlanId(Long mealPlanId);
+
+    @Query("""
+            SELECT mpi FROM MealPlanItem mpi
+            WHERE mpi.mealPlan.isActive = true
+            AND mpi.mealPlan.userId = :userId
+            ORDER BY mpi.mealDate ASC, mpi.mealType ASC
+            """)
+    List<MealPlanItem> findAllByActiveMealPlanAndUserId(@Param("userId") Long userId);
 
 }

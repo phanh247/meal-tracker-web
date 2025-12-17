@@ -2,6 +2,7 @@ package com.example.meal_tracker.controller;
 
 import com.example.meal_tracker.dto.request.AddMealPlanItemRequest;
 import com.example.meal_tracker.dto.request.UpdateMealPlanItemRequest;
+import com.example.meal_tracker.dto.response.ActiveMealPlanWithMealsResponse;
 import com.example.meal_tracker.dto.response.MealPlanItemResponse;
 import com.example.meal_tracker.dto.response.MealPlanResponse;
 import com.example.meal_tracker.exception.InvalidDataException;
@@ -94,4 +95,17 @@ public class MealPlanItemController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping(value = "/active-plan/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getActiveMealPlanWithMeals(@PathVariable("userId") Long userId) {
+        try {
+            LOGGER.info("Received request to get active meal plan with meals for user id: {}", userId);
+            ActiveMealPlanWithMealsResponse result = mealPlanItemService.getActiveMealPlanWithMeals(userId);
+            return ResponseEntity.ok(result);
+        } catch (BadRequestException e) {
+            LOGGER.error("Error getting active meal plan with meals: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
 }
+

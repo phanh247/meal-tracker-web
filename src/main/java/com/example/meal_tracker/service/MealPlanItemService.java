@@ -2,6 +2,7 @@ package com.example.meal_tracker.service;
 
 import com.example.meal_tracker.dto.request.AddMealPlanItemRequest;
 import com.example.meal_tracker.dto.request.UpdateMealPlanItemRequest;
+import com.example.meal_tracker.dto.response.ActiveMealPlanWithMealsResponse;
 import com.example.meal_tracker.dto.response.MealPlanItemResponse;
 
 import java.time.LocalDate;
@@ -19,4 +20,12 @@ public interface MealPlanItemService {
             throws BadRequestException;
 
     void deleteMealPlanItem(Long mealPlanItemId) throws BadRequestException;
+
+    /**
+     * Get active meal plan with all meals grouped by date
+     * @param userId user id
+     * @return ActiveMealPlanWithMealsResponse containing active meal plan and meals grouped by date
+     * @throws BadRequestException if no active meal plan found
+     */
+    ActiveMealPlanWithMealsResponse getActiveMealPlanWithMeals(Long userId) throws BadRequestException;
 }
